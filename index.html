@@ -1,0 +1,2955 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>BIOMAS_ESTADO DE CONSERVACION GRADO 10 | Gimnasio Cristiano Faro de Luz</title>
+
+  <!-- Tipografía y Librerías CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    :root {
+      --navy-deep: #081b38;
+      --navy-mid: #0f2b54;
+      --gold-main: #c89d28;
+      --gold-bright: #dfb235;
+      --emerald-main: #059669;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 20% 15%, #113468 0%, #081b38 55%, #040e1f 100%);
+      color: #f8fafc;
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    textarea, input[type="text"], input[type="password"], input[type="number"] {
+      user-select: text !important;
+      -webkit-user-select: text !important;
+    }
+
+    img, canvas {
+      -webkit-user-drag: none;
+      user-drag: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    #particlesBg {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .glass-card {
+      background: rgba(15, 43, 84, 0.62);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    .glass-panel-dark {
+      background: rgba(6, 18, 38, 0.78);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(200, 157, 40, 0.28);
+    }
+
+    .gold-gradient-btn {
+      background: linear-gradient(135deg, #c89d28 0%, #dfb235 50%, #b5891c 100%);
+      color: #081b38;
+      font-weight: 800;
+      transition: all 0.2s ease;
+    }
+
+    .gold-gradient-btn:hover:not(:disabled) {
+      transform: translateY(-1px) scale(1.01);
+      box-shadow: 0 8px 22px rgba(223, 178, 53, 0.38);
+    }
+
+    .gold-gradient-btn:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+
+    .option-card {
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: rgba(15, 34, 66, 0.68);
+    }
+
+    .option-card:hover {
+      border-color: rgba(223, 178, 53, 0.65);
+      background: rgba(22, 49, 92, 0.85);
+      transform: translateY(-1px);
+    }
+
+    .option-card.selected {
+      border-color: #10b981;
+      background: linear-gradient(135deg, rgba(5, 150, 105, 0.32), rgba(15, 43, 84, 0.88));
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.45);
+    }
+
+    input[type="range"] {
+      accent-color: #dfb235;
+      cursor: pointer;
+    }
+
+    .fade-section {
+      animation: fadeSlide 0.35s ease forwards;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media print {
+      body { display: none !important; }
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-amber-400 selection:text-slate-900">
+  <canvas id="particlesBg"></canvas>
+
+  <!-- FRANJA SUPERIOR DE SEGURIDAD Y TELEMETRÍA -->
+  <header class="sticky top-0 z-40 glass-panel-dark border-b border-amber-500/30 px-3 py-2.5">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5">
+        <span class="inline-flex h-3 w-3 rounded-full bg-emerald-400 animate-ping"></span>
+        <div class="text-xs sm:text-sm font-semibold text-slate-200">
+          <span class="text-amber-300 font-extrabold">SUPERVISIÓN ACTIVA</span>
+          <span class="hidden md:inline text-slate-400"> | Antisalida + Bloqueo Portapapeles + Autoguardado</span>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+        <!-- Sonómetro en vivo -->
+        <div id="noiseBadge" class="hidden sm:flex items-center gap-1.5 bg-slate-900/80 border border-slate-700 rounded-full px-2.5 py-1 text-xs">
+          <span class="text-cyan-300 font-semibold">Sonómetro:</span>
+          <div class="w-14 h-2 bg-slate-800 rounded-full overflow-hidden">
+            <div id="noiseBar" class="h-full bg-emerald-400 transition-all duration-150" style="width:8%"></div>
+          </div>
+          <span id="noisePct" class="text-slate-300 font-mono">0%</span>
+        </div>
+
+        <!-- Contador de Penalizaciones -->
+        <div class="flex items-center gap-1.5 bg-rose-950/70 border border-rose-500/40 rounded-full px-2.5 py-1 text-xs">
+          <span class="text-rose-300 font-bold">Penalización:</span>
+          <span id="headerPenaltyDisplay" class="font-mono font-extrabold text-rose-200">-0.00</span>
+        </div>
+
+        <!-- Reloj Global 45 Minutos -->
+        <div id="globalTimerWrap" class="hidden items-center gap-1.5 bg-amber-950/70 border border-amber-400/50 rounded-full px-3 py-1 text-xs sm:text-sm">
+          <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path stroke-linecap="round" d="M12 7v5l3 2"></path>
+          </svg>
+          <span id="globalTimerDisplay" class="font-mono font-extrabold text-amber-300">45:00</span>
+        </div>
+
+        <!-- Reloj del Dispositivo -->
+        <span id="liveClockDisplay" class="hidden lg:inline font-mono text-xs text-slate-300 bg-slate-900/75 px-2.5 py-1 rounded-md border border-slate-700">--:--:--</span>
+
+        <!-- Botón Acceso Docente -->
+        <button id="openTeacherBtn" type="button" class="gold-gradient-btn px-3 py-1.5 rounded-lg text-xs uppercase tracking-wider shadow">
+          Acceso Docente
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="relative z-10 max-w-6xl mx-auto px-3 sm:px-6 py-5 space-y-6">
+
+    <!-- BANNER INSTITUCIONAL -->
+    <div class="glass-card rounded-2xl p-2 sm:p-3 overflow-hidden">
+      <img id="mainBannerImg" alt="Banner Institucional Gimnasio Cristiano Faro de Luz" class="w-full h-auto rounded-xl object-cover shadow-lg" draggable="false" />
+    </div>
+
+    <!-- ================= PANTALLA DE BIENVENIDA ================= -->
+    <section id="welcomeScreen" class="fade-section glass-card rounded-3xl p-5 sm:p-8 space-y-6">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-white/10 pb-5">
+        <div>
+          <span class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 mb-2">
+            Ciencias Naturales y Educación Ambiental • Grado 10°
+          </span>
+          <h1 id="uiExamTitle" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            BIOMAS_ESTADO DE CONSERVACION GRADO 10
+          </h1>
+          <p class="text-slate-300 text-sm mt-1">
+            Docente: <strong class="text-amber-300">Cristian David Ayazo</strong> • Gimnasio Cristiano Faro de Luz
+          </p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-center bg-slate-950/60 p-3 rounded-2xl border border-white/10">
+          <div class="px-2">
+            <div class="text-[11px] uppercase text-slate-400 font-semibold">Mínima</div>
+            <div class="text-lg font-extrabold text-rose-300">1.00</div>
+          </div>
+          <div class="px-2 border-x border-white/10">
+            <div class="text-[11px] uppercase text-slate-400 font-semibold">Aprobatoria</div>
+            <div id="uiPassingScoreBadge" class="text-lg font-extrabold text-amber-300">3.70</div>
+          </div>
+          <div class="px-2">
+            <div class="text-[11px] uppercase text-slate-400 font-semibold">Máxima</div>
+            <div class="text-lg font-extrabold text-emerald-300">5.00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aviso de sesión guardada -->
+      <div id="savedSessionBanner" class="hidden bg-amber-500/15 border border-amber-400/50 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <h3 class="text-amber-300 font-bold text-sm uppercase tracking-wide">Progreso Guardado Detectado</h3>
+          <p id="savedSessionInfo" class="text-xs text-slate-200 mt-0.5"></p>
+        </div>
+        <button id="resumeSavedBtn" type="button" class="gold-gradient-btn px-4 py-2 rounded-xl text-xs uppercase tracking-wider shrink-0">
+          Reanudar Evaluación Guardada
+        </button>
+      </div>
+
+      <!-- Estructura de 45 minutos en 3 secciones -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-slate-900/65 border border-cyan-400/25 rounded-2xl p-4 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase text-cyan-300">Sección 1 • 12 Min</span>
+            <span class="text-xs font-extrabold bg-cyan-500/20 text-cyan-200 px-2 py-0.5 rounded-full">25%</span>
+          </div>
+          <h3 class="font-bold text-white text-base">Simulaciones de Biomas</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Modifica factores climáticos y antrópicos en 3 biomas estratégicos de Colombia, observa sus consecuencias en 3D y sustenta científicamente lo ocurrido.
+          </p>
+        </div>
+
+        <div class="bg-slate-900/65 border border-amber-400/25 rounded-2xl p-4 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase text-amber-300">Sección 2 • 18 Min</span>
+            <span class="text-xs font-extrabold bg-amber-500/20 text-amber-200 px-2 py-0.5 rounded-full">45%</span>
+          </div>
+          <h3 class="font-bold text-white text-base">15 Ítems Prueba Saber</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Análisis contextual de los ciclos biogeoquímicos (C, N, P, S y H₂O) apoyado en láminas científicas HD y visores moleculares 3D interactivos.
+          </p>
+        </div>
+
+        <div class="bg-slate-900/65 border border-emerald-400/25 rounded-2xl p-4 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase text-emerald-300">Sección 3 • 15 Min</span>
+            <span class="text-xs font-extrabold bg-emerald-500/20 text-emerald-200 px-2 py-0.5 rounded-full">30%</span>
+          </div>
+          <h3 class="font-bold text-white text-base">5 Casos de Rol Ambiental</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Asume 5 roles científicos distintos frente a emergencias reales de contaminación ambiental biogeoquímica y formula soluciones fundamentadas.
+          </p>
+        </div>
+      </div>
+
+      <!-- Condiciones estrictas antifraude -->
+      <div class="bg-rose-950/35 border border-rose-400/30 rounded-2xl p-4 space-y-2">
+        <h3 class="text-sm font-extrabold text-rose-300 uppercase tracking-wide flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 3.75h.008v.008H12v-.008zm9.303 3.376c.866 1.5-.217 3.374-1.948 3.374H4.645c-1.73 0-2.813-1.874-1.948-3.374L10.052 3.378c.866-1.5 3.032-1.5 3.898 0L21.303 16.5z" />
+          </svg>
+          Reglamento Técnico de la Actividad (45 Minutos Totales)
+        </h3>
+        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-200">
+          <li>• <strong>Prohibido salir de la pestaña o prueba:</strong> Cada salida o pérdida de foco aplica penalización automática de <strong>-0.30 puntos</strong>.</li>
+          <li>• <strong>Pantalla completa obligatoria:</strong> Abandonar el modo pantalla completa bloquea la interfaz y descuenta <strong>-0.20 puntos</strong> por reincidencia.</li>
+          <li>• <strong>Bloqueo de copiado/pegado e imágenes:</strong> Está deshabilitado copiar, pegar imágenes o texto, clic derecho e inspección de código.</li>
+          <li>• <strong>Persistencia e Informe PDF automático:</strong> Tu avance se guarda cada segundo; al finalizar se descarga automáticamente tu informe en <strong>.PDF</strong>.</li>
+        </ul>
+      </div>
+
+      <!-- Formulario de ingreso del estudiante -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+        <div class="md:col-span-2">
+          <label class="block text-xs font-bold uppercase tracking-wider text-amber-300 mb-1.5">
+            Nombres y Apellidos Completos del Estudiante *
+          </label>
+          <input id="studentNameInput" type="text" autocomplete="off" placeholder="Ej: Valentina Morales Restrepo"
+            class="w-full rounded-xl bg-slate-950/80 border border-slate-600 focus:border-amber-400 focus:outline-none px-4 py-3 text-white text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-amber-300 mb-1.5">
+            Curso / Sección Grado 10° *
+          </label>
+          <select id="studentGroupInput" class="w-full rounded-xl bg-slate-950/80 border border-slate-600 focus:border-amber-400 focus:outline-none px-4 py-3 text-white text-sm">
+            <option value="10° A">Grado 10° A</option>
+            <option value="10° B">Grado 10° B</option>
+            <option value="10° Único">Grado 10° Único</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+        <span class="text-xs text-slate-400">Horario: Acceso habilitado • Duración total: <strong id="welcomeMinutesLabel" class="text-white">45 minutos</strong></span>
+        <button id="startExamBtn" type="button" disabled
+          class="w-full sm:w-auto gold-gradient-btn disabled:opacity-40 disabled:cursor-not-allowed px-7 py-3.5 rounded-xl text-sm uppercase tracking-wider">
+          Iniciar Actividad Evaluativa (45:00)
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= CONTENEDOR ACTIVO DE LA PRUEBA ================= -->
+    <section id="examWorkspace" class="hidden space-y-5">
+
+      <!-- Barra de Progreso y Navegación de Secciones -->
+      <div class="glass-card rounded-2xl p-4 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div>
+            <span class="text-slate-400">Estudiante:</span>
+            <strong id="activeStudentLabel" class="text-white ml-1"></strong>
+            <span id="activeGroupLabel" class="ml-2 px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold"></span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span id="autosaveIndicator" class="text-emerald-300 font-semibold">✓ Progreso autoguardado</span>
+            <span id="sectionBudgetBadge" class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-cyan-300 font-bold"></span>
+          </div>
+        </div>
+
+        <!-- Pestañas de las 3 secciones -->
+        <div class="grid grid-cols-3 gap-2">
+          <button type="button" data-sec="1" class="sec-nav-btn rounded-xl py-2.5 px-3 text-xs sm:text-sm font-bold border transition text-left">
+            <div class="text-[10px] uppercase opacity-75">Sección 1 (12 min)</div>
+            <div>1. Simulaciones Biomas</div>
+          </button>
+          <button type="button" data-sec="2" class="sec-nav-btn rounded-xl py-2.5 px-3 text-xs sm:text-sm font-bold border transition text-left">
+            <div class="text-[10px] uppercase opacity-75">Sección 2 (18 min)</div>
+            <div>2. Prueba Saber (15)</div>
+          </button>
+          <button type="button" data-sec="3" class="sec-nav-btn rounded-xl py-2.5 px-3 text-xs sm:text-sm font-bold border transition text-left">
+            <div class="text-[10px] uppercase opacity-75">Sección 3 (15 min)</div>
+            <div>3. Roles y Casos (5)</div>
+          </button>
+        </div>
+
+        <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden">
+          <div id="overallProgressBar" class="h-full bg-gradient-to-r from-cyan-400 via-amber-400 to-emerald-400 transition-all duration-300" style="width: 5%"></div>
+        </div>
+      </div>
+
+      <!-- ============ SECCIÓN 1: SIMULACIONES DE BIOMAS COLOMBIANOS ============ -->
+      <div id="section1Container" class="fade-section glass-card rounded-3xl p-5 sm:p-7 space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider text-cyan-300">Sección 1 de 3 • Laboratorio Ecológico Interactivo (25% de la nota)</span>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-white mt-0.5">Simulación y Estado de Conservación de Biomas Colombianos</h2>
+          </div>
+          <div class="flex gap-2" id="simSelectorTabs"></div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Visor 3D + Lámina Dinámica PNG -->
+          <div class="lg:col-span-7 space-y-4">
+            <div class="bg-slate-950/80 border border-slate-700 rounded-2xl overflow-hidden">
+              <div class="flex items-center justify-between px-4 py-2 bg-slate-900/90 border-b border-slate-800 text-xs">
+                <span id="simBiomeTitle" class="font-bold text-amber-300"></span>
+                <span id="simUicnBadge" class="px-2.5 py-0.5 rounded-full font-extrabold"></span>
+              </div>
+              <!-- Imagen PNG dinámica en tiempo real -->
+              <img id="simDynamicPlateImg" alt="Simulación de Bioma Colombiano" class="w-full h-56 sm:h-64 object-cover border-b border-slate-800" draggable="false" />
+              <!-- Visor 3D Isométrico Three.js -->
+              <div class="relative">
+                <div id="sim3DViewport" class="w-full h-52 cursor-grab active:cursor-grabbing"></div>
+                <span class="absolute bottom-2 right-3 text-[11px] bg-slate-950/80 text-cyan-300 px-2.5 py-0.5 rounded-full border border-cyan-500/30 pointer-events-none">
+                  Modelo 3D Interactivo • Arrastra para rotar 360°
+                </span>
+              </div>
+            </div>
+
+            <!-- Indicadores Ecológicos Consecuentes -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5" id="simMetricsGrid"></div>
+          </div>
+
+          <!-- Controles de Modificación + Sustentación -->
+          <div class="lg:col-span-5 space-y-4">
+            <div class="bg-slate-900/75 border border-white/10 rounded-2xl p-4 space-y-4">
+              <div class="flex items-center justify-between">
+                <h3 class="text-sm font-extrabold uppercase tracking-wider text-amber-300">Modifica los Elementos del Bioma</h3>
+                <button id="resetSimVarsBtn" type="button" class="text-xs text-cyan-300 hover:underline">Restaurar estado prístino</button>
+              </div>
+              <p id="simContextDesc" class="text-xs text-slate-300 leading-relaxed"></p>
+              <div id="simSlidersContainer" class="space-y-3.5"></div>
+              <div id="simConsequenceAlert" class="p-3 rounded-xl text-xs leading-relaxed border"></div>
+              <div class="text-[11px] text-slate-400 flex items-center justify-between">
+                <span>Modificaciones registradas en este bioma:</span>
+                <strong id="simInteractionsCount" class="text-emerald-300">0 ajustes (mínimo 3 requeridos)</strong>
+              </div>
+            </div>
+
+            <!-- Cuadro de Sustentación Obligatoria -->
+            <div class="bg-slate-900/80 border border-cyan-500/30 rounded-2xl p-4 space-y-2.5">
+              <label for="simJustificationInput" class="block text-xs font-extrabold uppercase tracking-wider text-cyan-300">
+                Sustentación Científica de las Consecuencias Observadas *
+              </label>
+              <p class="text-[11px] text-slate-300">
+                Explica qué ocurrió en el estado de conservación, la biodiversidad y los flujos de materia/energía cuando modificaste los elementos del bioma (mínimo 25 palabras con vocabulario científico).
+              </p>
+              <textarea id="simJustificationInput" rows="5"
+                placeholder="Sustenta aquí causas, alteraciones ecológicas observadas y consecuencias para la conservación de este bioma colombiano..."
+                class="w-full rounded-xl bg-slate-950/90 border border-slate-700 focus:border-cyan-400 focus:outline-none p-3 text-xs sm:text-sm text-white resize-none"></textarea>
+              <div class="flex items-center justify-between text-[11px]">
+                <span id="simWordValidationMsg" class="text-amber-300 font-semibold">0 / 25 palabras mínimas</span>
+                <span id="simCompletionBadge" class="font-bold text-slate-400">Pendiente</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/10">
+          <button id="prevSimBtn" type="button" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200">
+            ← Bioma Anterior
+          </button>
+          <button id="nextSimOrSectionBtn" type="button" class="gold-gradient-btn px-6 py-2.5 rounded-xl text-xs uppercase tracking-wider">
+            Siguiente Bioma →
+          </button>
+        </div>
+      </div>
+
+      <!-- ============ SECCIÓN 2: 15 PREGUNTAS TIPO PRUEBA SABER ============ -->
+      <div id="section2Container" class="hidden fade-section glass-card rounded-3xl p-5 sm:p-7 space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+          <div>
+            <span id="saberCompetencyBadge" class="text-xs font-extrabold uppercase tracking-wider text-amber-300"></span>
+            <h2 id="saberQuestionHeader" class="text-xl sm:text-2xl font-extrabold text-white mt-0.5">Pregunta 1 de 15</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="saberMinReadBadge" class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-slate-900 border border-amber-500/40 text-amber-300">
+              Lectura: 15s
+            </span>
+          </div>
+        </div>
+
+        <!-- Grilla rápida de las 15 preguntas -->
+        <div id="saberPillsGrid" class="flex flex-wrap gap-1.5"></div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <!-- Columna Izquierda: Lectura + Lámina PNG HD + Visor Molecular 3D -->
+          <div class="lg:col-span-6 space-y-4">
+            <div class="bg-slate-900/75 border border-white/10 rounded-2xl p-4 space-y-2">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-cyan-300">Contexto Científico • Ciclos Biogeoquímicos</span>
+              <p id="saberContextText" class="text-xs sm:text-sm text-slate-200 leading-relaxed text-justify"></p>
+            </div>
+
+            <div class="bg-slate-950/85 border border-slate-700 rounded-2xl overflow-hidden">
+              <img id="saberPlateImg" alt="Lámina Científica Ciclo Biogeoquímico" class="w-full h-56 sm:h-64 object-cover" draggable="false" />
+              <div class="border-t border-slate-800 relative">
+                <div id="saberMolecule3D" class="w-full h-40 cursor-grab active:cursor-grabbing"></div>
+                <span id="saberMoleculeLabel" class="absolute bottom-2 right-3 text-[11px] bg-slate-950/85 text-amber-300 px-2.5 py-0.5 rounded-full border border-amber-500/30 pointer-events-none"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Columna Derecha: Enunciado y Opciones Homogéneas sin parámetros -->
+          <div class="lg:col-span-6 space-y-4">
+            <div class="bg-amber-500/10 border border-amber-400/30 rounded-2xl p-4">
+              <h3 id="saberStemText" class="text-sm sm:text-base font-bold text-white leading-snug"></h3>
+            </div>
+
+            <div id="saberOptionsContainer" class="space-y-3"></div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/10">
+          <button id="prevSaberBtn" type="button" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200">
+            ← Pregunta Anterior
+          </button>
+          <button id="nextSaberBtn" type="button" class="gold-gradient-btn px-6 py-2.5 rounded-xl text-xs uppercase tracking-wider">
+            Siguiente Pregunta →
+          </button>
+        </div>
+      </div>
+
+      <!-- ============ SECCIÓN 3: ROLES Y CONTAMINACIÓN AMBIENTAL (5 ABIERTAS) ============ -->
+      <div id="section3Container" class="hidden fade-section glass-card rounded-3xl p-5 sm:p-7 space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-300">Sección 3 de 3 • Juego de Roles Científicos (30% de la nota)</span>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-white mt-0.5">Análisis de Contaminación Asociada a Ciclos Biogeoquímicos</h2>
+          </div>
+          <div id="roleSelectorPills" class="flex flex-wrap gap-1.5"></div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Tarjeta de Rol + Lámina del Caso -->
+          <div class="lg:col-span-6 space-y-4">
+            <div class="bg-gradient-to-br from-emerald-950/75 to-slate-900/90 border border-emerald-400/35 rounded-2xl p-4 space-y-2">
+              <div class="flex items-center justify-between">
+                <span id="roleBadgeLabel" class="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30"></span>
+                <span id="roleCycleTag" class="text-xs font-bold text-amber-300"></span>
+              </div>
+              <h3 id="roleCaseTitle" class="text-base sm:text-lg font-extrabold text-white"></h3>
+              <p id="roleScenarioText" class="text-xs sm:text-sm text-slate-200 leading-relaxed text-justify"></p>
+            </div>
+
+            <div class="bg-slate-950/85 border border-slate-700 rounded-2xl overflow-hidden">
+              <img id="roleCasePlateImg" alt="Caso de Contaminación Ambiental" class="w-full h-56 sm:h-64 object-cover" draggable="false" />
+            </div>
+          </div>
+
+          <!-- Pregunta Abierta del Rol -->
+          <div class="lg:col-span-6 space-y-4">
+            <div class="bg-amber-500/10 border border-amber-400/30 rounded-2xl p-4">
+              <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-300">Misión desde tu Rol Profesional</span>
+              <p id="rolePromptQuestion" class="text-sm font-bold text-white mt-1 leading-relaxed"></p>
+            </div>
+
+            <div class="bg-slate-900/80 border border-emerald-500/30 rounded-2xl p-4 space-y-2.5">
+              <label for="roleAnswerInput" class="block text-xs font-extrabold uppercase tracking-wider text-emerald-300">
+                Resolución Técnica y Propuesta de Manejo *
+              </label>
+              <textarea id="roleAnswerInput" rows="8"
+                placeholder="Redacta desde tu rol el análisis químico-ecológico de la alteración del ciclo biogeoquímico y tu estrategia concreta de mitigación..."
+                class="w-full rounded-xl bg-slate-950/90 border border-slate-700 focus:border-emerald-400 focus:outline-none p-3.5 text-xs sm:text-sm text-white resize-none"></textarea>
+              <div class="flex items-center justify-between text-xs">
+                <span id="roleWordCountMsg" class="text-amber-300 font-semibold">0 / 28 palabras mínimas</span>
+                <span id="roleStatusTag" class="font-bold text-slate-400">En redacción</span>
+              </div>
+            </div>
+
+            <!-- Botón Finalizar Prueba -->
+            <div class="bg-slate-950/75 border border-white/10 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div class="text-xs text-slate-300">
+                Verifica haber completado las <strong>3 simulaciones</strong>, las <strong>15 preguntas Saber</strong> y los <strong>5 casos de rol</strong> antes de entregar.
+              </div>
+              <button id="finishExamBtn" type="button" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold px-5 py-3 rounded-xl text-xs uppercase tracking-wider transition shrink-0">
+                Finalizar y Generar PDF
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/10">
+          <button id="prevRoleBtn" type="button" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200">
+            ← Caso Anterior
+          </button>
+          <button id="nextRoleBtn" type="button" class="gold-gradient-btn px-6 py-2.5 rounded-xl text-xs uppercase tracking-wider">
+            Siguiente Caso de Rol →
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= PANTALLA DE RESULTADOS E INFORME PDF ================= -->
+    <section id="resultsScreen" class="hidden fade-section glass-card rounded-3xl p-6 sm:p-8 space-y-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 border-b border-white/10 pb-6">
+        <div class="space-y-2 text-center md:text-left">
+          <span id="finalApprovalBadge" class="inline-block px-3.5 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider"></span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Informe Oficial de Resultados</h2>
+          <p id="finalStudentMeta" class="text-sm text-slate-300"></p>
+          <p class="text-xs text-emerald-300 font-semibold">✓ El archivo .PDF oficial se ha generado automáticamente.</p>
+        </div>
+
+        <div class="flex items-center gap-5 bg-slate-950/80 border border-amber-400/40 rounded-3xl p-4">
+          <div class="text-center px-3">
+            <div class="text-xs uppercase font-bold text-slate-400">Nota Definitiva</div>
+            <div id="finalGradeNumber" class="text-4xl sm:text-5xl font-extrabold text-amber-300 font-mono">1.00</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">Escala 1.00 – 5.00 (Aprueba 3.70)</div>
+          </div>
+          <canvas id="resultQrCanvas" class="rounded-xl bg-white p-1.5"></canvas>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-center">
+        <div class="bg-slate-900/75 border border-cyan-500/30 rounded-2xl p-4">
+          <div class="text-xs text-cyan-300 font-bold uppercase">Sección 1 (Simulaciones)</div>
+          <div id="resSec1Score" class="text-2xl font-extrabold text-white mt-1">0%</div>
+        </div>
+        <div class="bg-slate-900/75 border border-amber-500/30 rounded-2xl p-4">
+          <div class="text-xs text-amber-300 font-bold uppercase">Sección 2 (Prueba Saber)</div>
+          <div id="resSec2Score" class="text-2xl font-extrabold text-white mt-1">0 / 15</div>
+        </div>
+        <div class="bg-slate-900/75 border border-emerald-500/30 rounded-2xl p-4">
+          <div class="text-xs text-emerald-300 font-bold uppercase">Sección 3 (5 Roles)</div>
+          <div id="resSec3Score" class="text-2xl font-extrabold text-white mt-1">0%</div>
+        </div>
+        <div class="bg-rose-950/50 border border-rose-500/30 rounded-2xl p-4">
+          <div class="text-xs text-rose-300 font-bold uppercase">Penalizaciones</div>
+          <div id="resPenaltyTotal" class="text-2xl font-extrabold text-rose-200 mt-1">-0.00</div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
+        <button id="downloadPdfAgainBtn" type="button" class="gold-gradient-btn px-7 py-3.5 rounded-xl text-sm uppercase tracking-wider">
+          Descargar Informe Completo (.PDF)
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MODAL BLOQUEANTE DE PANTALLA COMPLETA ================= -->
+  <div id="fullscreenModal" class="hidden fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-4">
+    <div class="glass-card max-w-md w-full rounded-3xl p-6 text-center space-y-4 border border-rose-500/50">
+      <div class="w-14 h-14 mx-auto rounded-full bg-rose-500/20 border border-rose-400 flex items-center justify-center text-rose-300 text-2xl font-extrabold">!</div>
+      <h3 class="text-xl font-extrabold text-white">No Está Permitido Salir de la Prueba</h3>
+      <p id="securityModalReason" class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+        Se detectó abandono del entorno seguro o de la pantalla completa. Tu progreso sigue guardado, pero debes regresar inmediatamente para evitar penalizaciones adicionales.
+      </p>
+      <button id="restoreFullscreenBtn" type="button" class="w-full gold-gradient-btn py-3 rounded-xl text-xs uppercase tracking-wider">
+        Volver a Pantalla Completa y Continuar
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= MODAL DE CONFIRMACIÓN DE ENTREGA ================= -->
+  <div id="confirmSubmitModal" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-lg flex items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full rounded-3xl p-6 space-y-4 border border-amber-400/40">
+      <h3 class="text-xl font-extrabold text-white">Confirmar Cierre y Generación de PDF</h3>
+      <p id="confirmSubmitSummary" class="text-xs sm:text-sm text-slate-300 leading-relaxed"></p>
+      <div class="flex justify-end gap-3 pt-2">
+        <button id="cancelSubmitBtn" type="button" class="px-4 py-2.5 rounded-xl bg-slate-800 text-xs font-bold text-slate-200">
+          Seguir Revisando
+        </button>
+        <button id="confirmFinalSubmitBtn" type="button" class="gold-gradient-btn px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider">
+          Entregar Ahora y Descargar PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL EXCLUSIVO ACCESO DOCENTE ================= -->
+  <div id="teacherModal" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-lg flex items-center justify-center p-4">
+    <div class="glass-card max-w-xl w-full rounded-3xl p-6 space-y-5 border border-amber-400/50 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <h3 class="text-lg font-extrabold text-amber-300 uppercase tracking-wide">Panel Maestro Docente</h3>
+        <button id="closeTeacherModalBtn" type="button" class="text-slate-400 hover:text-white text-sm font-bold">✕ Cerrar</button>
+      </div>
+
+      <!-- Vista de autenticación oculta -->
+      <div id="teacherAuthStep" class="space-y-3">
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">Credencial de Autorización Docente</label>
+        <input id="teacherKeyInput" type="password" inputmode="numeric" autocomplete="off" placeholder="Ingrese credencial autorizada"
+          class="w-full rounded-xl bg-slate-950 border border-slate-700 focus:border-amber-400 focus:outline-none px-4 py-3 text-white text-sm" />
+        <p id="teacherAuthError" class="hidden text-xs text-rose-400 font-semibold">Credencial inválida. Acceso denegado.</p>
+        <button id="verifyTeacherBtn" type="button" class="w-full gold-gradient-btn py-3 rounded-xl text-xs uppercase tracking-wider">
+          Desbloquear Controles de Modificación
+        </button>
+      </div>
+
+      <!-- Controles de Modificación Docente -->
+      <div id="teacherControlsStep" class="hidden space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-900/80 p-4 rounded-2xl border border-white/10">
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-amber-300 mb-1">Título de la Actividad</label>
+            <input id="tEditTitle" type="text" class="w-full rounded-lg bg-slate-950 border border-slate-700 px-3 py-2 text-xs text-white" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-amber-300 mb-1">Nota Aprobatoria (1.0 - 5.0)</label>
+            <input id="tEditPassing" type="number" step="0.1" min="1.0" max="5.0" class="w-full rounded-lg bg-slate-950 border border-slate-700 px-3 py-2 text-xs text-white" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-amber-300 mb-1">Ajustar Minutos Restantes</label>
+            <input id="tEditRemainingMin" type="number" min="1" max="120" class="w-full rounded-lg bg-slate-950 border border-slate-700 px-3 py-2 text-xs text-white" />
+          </div>
+          <div class="flex items-center justify-between pt-4">
+            <span class="text-xs text-slate-200 font-semibold">Sonómetro activo (&gt;60%)</span>
+            <input id="tToggleNoise" type="checkbox" checked class="w-4 h-4 accent-amber-400" />
+          </div>
+        </div>
+
+        <button id="tSaveModificationsBtn" type="button" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold py-2.5 rounded-xl text-xs uppercase tracking-wider">
+          Guardar Modificaciones en Vivo
+        </button>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <button id="tUnlockTimersBtn" type="button" class="bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold py-2.5 px-3 rounded-xl text-xs">
+            1. Desbloquear Temporizadores Lectura
+          </button>
+          <button id="tClearPenaltiesBtn" type="button" class="bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold py-2.5 px-3 rounded-xl text-xs">
+            2. Anular Penalizaciones Estudiante
+          </button>
+          <button id="tJumpSec2Btn" type="button" class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs">
+            3. Ir a Sección 2 (Prueba Saber)
+          </button>
+          <button id="tJumpSec3Btn" type="button" class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs">
+            4. Ir a Sección 3 (Roles Abiertos)
+          </button>
+          <button id="tForceFinishBtn" type="button" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-2.5 px-3 rounded-xl text-xs">
+            5. Finalizar Ahora y Exportar PDF
+          </button>
+          <button id="tResetAttemptBtn" type="button" class="bg-rose-700 hover:bg-rose-600 text-white font-extrabold py-2.5 px-3 rounded-xl text-xs">
+            6. Borrar Intento Guardado Local
+          </button>
+        </div>
+        <p id="teacherFeedbackMsg" class="text-xs text-emerald-300 font-semibold text-center"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST DE NOTIFICACIONES -->
+  <div id="toastBanner" class="hidden fixed bottom-4 right-4 z-50 max-w-sm glass-panel-dark border-l-4 border-rose-500 px-4 py-3 rounded-xl shadow-2xl text-xs text-white"></div>
+
+  <script>
+    /* =========================================================================
+       CONFIGURACIÓN INSTITUCIONAL, FIREBASE Y PARÁMETROS EVALUATIVOS
+       ========================================================================= */
+    const EXAM_CONFIG = {
+      examId: 'biomas-conservacion-g10-2026',
+      examTitle: 'BIOMAS_ESTADO DE CONSERVACION GRADO 10',
+      institution: 'GIMNASIO CRISTIANO FARO DE LUZ',
+      teacherName: 'Cristian David Ayazo',
+      grade: 'Grado 10°',
+      minGrade: 1.0,
+      maxGrade: 5.0,
+      passingGrade: 3.7,
+      totalDurationSeconds: 45 * 60, // 45 minutos exactos (12m + 18m + 15m)
+      sectionBudgets: {
+        1: 'Presupuesto sugerido: 12 min (Simulaciones)',
+        2: 'Presupuesto sugerido: 18 min (15 Preguntas Saber)',
+        3: 'Presupuesto sugerido: 15 min (5 Casos de Rol)'
+      },
+      storageKey: 'FARO_LUZ_BIOMAS_CONSERVACION_G10_V1',
+      firebaseUrl: 'https://faro-luz-evaluaciones-default-rtdb.firebaseio.com',
+      noiseEnabled: true
+    };
+
+    // Verificación criptográfica ligera sin exponer clave en texto plano al DOM
+    function verifyTeacherCredential(rawInput) {
+      const clean = String(rawInput || '').trim();
+      let h1 = 0x811c9dc5;
+      for (let i = 0; i < clean.length; i++) {
+        h1 ^= clean.charCodeAt(i);
+        h1 = Math.imul(h1, 0x01000193) >>> 0;
+      }
+      // Coincide exclusivamente con la credencial numérica configurada por el docente
+      return clean.length === 11 && h1 === 3482623788;
+    }
+
+    /* =========================================================================
+       DATOS CIENTÍFICOS SECCIÓN 1: 3 SIMULADORES DE BIOMAS COLOMBIANOS
+       ========================================================================= */
+    const BIOME_SIMULATIONS = [
+      {
+        id: 'paramo',
+        name: 'Páramo Andino Colombiano (Sumapaz - Santurbán)',
+        shortTab: '1. Páramo Andino',
+        description: 'Ecosistema estratégico de alta montaña (3.100–4.200 m s. n. m.) que regula el suministro de agua potable del 70% de la población colombiana gracias a sus frailejones (Espeletia) y suelos de turbera ricos en carbono.',
+        sliders: [
+          { key: 'tempDelta', label: 'Aumento de Temperatura Media (°C)', min: 0, max: 4.5, step: 0.5, defaultVal: 0.5, unit: '+°C' },
+          { key: 'agriFrontier', label: 'Expansión Agrícola y Ganadera (%)', min: 0, max: 85, step: 5, defaultVal: 10, unit: '%' },
+          { key: 'frailejonCover', label: 'Cobertura de Frailejones y Musgos (%)', min: 15, max: 100, step: 5, defaultVal: 90, unit: '%' }
+        ],
+        keywords: ['agua', 'hidric', 'frailejon', 'turbera', 'carbono', 'temperatura', 'conservacion', 'suelo', 'endem', 'erosion', 'paramo'],
+        compute(v) {
+          const stress = (v.tempDelta / 4.5) * 38 + (v.agriFrontier / 85) * 37 + ((100 - v.frailejonCover) / 85) * 25;
+          const waterReg = Math.max(8, Math.round(98 - stress * 0.92));
+          const peatCarbon = Math.max(45, Math.round(380 - stress * 3.3));
+          const endemicBio = Math.max(10, Math.round(96 - stress * 0.88));
+          const erosion = Math.min(95, Math.round(6 + stress * 0.89));
+          return buildConservationSummary(stress, [
+            { label: 'Regulación Hídrica', value: waterReg + '%', good: waterReg >= 65 },
+            { label: 'Carbono en Turbera', value: peatCarbon + ' tC/ha', good: peatCarbon >= 240 },
+            { label: 'Biodiversidad Endémica', value: endemicBio + '%', good: endemicBio >= 65 },
+            { label: 'Compactación / Erosión', value: erosion + '%', good: erosion <= 30 }
+          ], stress < 25
+            ? 'Equilibrio hidrológico estable: la necromasa de Espeletia intercepta niebla horizontal y mantiene turberas saturadas actuando como sumidero neto de carbono.'
+            : stress < 55
+              ? 'Alerta ecológica intermedia: el calentamiento desplaza las especies criófilas hacia cumbres sin área disponible y la frontera agropecuaria oxida parcialmente las turberas.'
+              : 'Colapso funcional severo: las turberas drenadas pasan de sumideros a fuentes masivas de CO₂, desaparece la captación de niebla y se interrumpe el caudal base de las cuencas andinas.');
+        }
+      },
+      {
+        id: 'bosque_seco',
+        name: 'Bosque Seco Tropical (Caribe y Valle del Sinú)',
+        shortTab: '2. Bosque Seco',
+        description: 'Uno de los biomas más amenazados de Colombia (resta menos del 8% de su cobertura original). Presenta especies caducifolias adaptadas a sequías estacionales severas y alta simbiosis con bacterias fijadoras de nitrógeno.',
+        sliders: [
+          { key: 'deforestation', label: 'Potrerización y Tala para Ganadería (%)', min: 0, max: 95, step: 5, defaultVal: 15, unit: '%' },
+          { key: 'droughtMonths', label: 'Duración de Sequía Extrema (Meses)', min: 2, max: 9, step: 1, defaultVal: 4, unit: ' meses' },
+          { key: 'corridors', label: 'Conectividad de Corredores Biológicos (%)', min: 5, max: 100, step: 5, defaultVal: 80, unit: '%' }
+        ],
+        keywords: ['seco', 'fragmentacion', 'corredor', 'erosion', 'desertificacion', 'ganaderia', 'sequia', 'nitrogeno', 'biodiversidad', 'titi', 'suelo'],
+        compute(v) {
+          const stress = (v.deforestation / 95) * 45 + ((v.droughtMonths - 2) / 7) * 25 + ((100 - v.corridors) / 95) * 30;
+          const soilFertility = Math.max(9, Math.round(94 - stress * 0.87));
+          const geneticFlow = Math.max(5, Math.round(v.corridors * (1 - v.deforestation * 0.006)));
+          const desertRisk = Math.min(98, Math.round(10 + stress * 0.88));
+          const faunaViability = Math.max(6, Math.round(95 - stress * 0.9));
+          return buildConservationSummary(stress, [
+            { label: 'Fertilidad / N₂ Edáfico', value: soilFertility + '%', good: soilFertility >= 60 },
+            { label: 'Flujo Génico Fauna', value: geneticFlow + '%', good: geneticFlow >= 55 },
+            { label: 'Riesgo Desertificación', value: desertRisk + '%', good: desertRisk <= 35 },
+            { label: 'Viabilidad Tití Cabeciblanco', value: faunaViability + '%', good: faunaViability >= 60 }
+          ], stress < 25
+            ? 'Bosque resiliente: el dosel caducifolio aporta hojarasca estacional, protege el suelo frente a lluvias torrenciales y sostiene poblaciones viables de primates y polinizadores.'
+            : stress < 58
+              ? 'Fragmentación crítica en progreso: el aislamiento de parches boscosos reduce la dispersión de semillas, incrementa el efecto de borde e intensifica la pérdida de humedad edáfica.'
+              : 'Desertificación irreversible del bioma: la compactación por pisoteo bovino y la ausencia de raíces leguminosas eliminan el nitrógeno disponible y llevan a extinción local de endemismos.');
+        }
+      },
+      {
+        id: 'selva_humeda',
+        name: 'Bosque Húmedo Tropical (Amazonía y Chocó Biogeográfico)',
+        shortTab: '3. Selva Húmeda',
+        description: 'Megarreservorio de biodiversidad terrestre con reciclaje ultrarrápido de nutrientes en la capa superficial de hojarasca sobre suelos ácidos (oxisoles) y motor continental de los ríos voladores de vapor de agua.',
+        sliders: [
+          { key: 'clearcut', label: 'Deforestación y Quema de Dosel (%)', min: 0, max: 90, step: 5, defaultVal: 10, unit: '%' },
+          { key: 'mercuryMining', label: 'Minería Aluvial y Mercurio en Ríos (%)', min: 0, max: 80, step: 5, defaultVal: 5, unit: '%' },
+          { key: 'evapoRate', label: 'Integridad de Evapotranspiración (%)', min: 25, max: 100, step: 5, defaultVal: 95, unit: '%' }
+        ],
+        keywords: ['amazon', 'choco', 'lixiviacion', 'mercurio', 'evapotranspiracion', 'nutrientes', 'carbono', 'dosel', 'trofic', 'lluvia', 'suelo'],
+        compute(v) {
+          const stress = (v.clearcut / 90) * 42 + (v.mercuryMining / 80) * 33 + ((100 - v.evapoRate) / 75) * 25;
+          const flyingRivers = Math.max(15, Math.round(v.evapoRate * (1 - v.clearcut * 0.0055)));
+          const nutrientRetention = Math.max(8, Math.round(95 - v.clearcut * 0.92));
+          const aquaticHealth = Math.max(5, Math.round(98 - v.mercuryMining * 1.15));
+          const carbonSink = Math.round(290 - stress * 3.1);
+          return buildConservationSummary(stress, [
+            { label: 'Ríos Voladores a Andes', value: flyingRivers + '%', good: flyingRivers >= 65 },
+            { label: 'Retención Fósforo/Calcio', value: nutrientRetention + '%', good: nutrientRetention >= 65 },
+            { label: 'Salud Red Trófica Fluvial', value: aquaticHealth + '%', good: aquaticHealth >= 70 },
+            { label: 'Balance Neto Carbono', value: (carbonSink >= 0 ? '+' : '') + carbonSink + ' tC/ha', good: carbonSink >= 120 }
+          ], stress < 25
+            ? 'Reciclaje biogeoquímico cerrado: las micorrizas reabsorben fósforo y calcio antes de su lixiviación y el dosel bombea humedad atmosférica hacia la región Andina.'
+            : stress < 58
+              ? 'Degradación acoplada: la pérdida de cobertura expone los oxisoles al lavado pluvial acelerado mientras el metilmercurio inicia bioacumulación en peces detritívoros.'
+              : 'Sabanización y toxicidad trófica: los suelos lavados pierden fertilidad en pocos años, cae drásticamente el transporte de humedad continental y se contamina toda la cadena alimentaria fluvial.');
+        }
+      }
+    ];
+
+    function buildConservationSummary(stress, metrics, narrative) {
+      let uicn = 'Preocupación Menor (LC)';
+      let badgeClass = 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40';
+      let alertClass = 'bg-emerald-950/40 border-emerald-500/40 text-emerald-100';
+      if (stress >= 72) {
+        uicn = 'En Peligro Crítico (CR)';
+        badgeClass = 'bg-rose-600/30 text-rose-200 border border-rose-400/60';
+        alertClass = 'bg-rose-950/55 border-rose-500/50 text-rose-100';
+      } else if (stress >= 48) {
+        uicn = 'En Peligro (EN)';
+        badgeClass = 'bg-orange-500/25 text-orange-200 border border-orange-400/50';
+        alertClass = 'bg-orange-950/50 border-orange-500/40 text-orange-100';
+      } else if (stress >= 25) {
+        uicn = 'Vulnerable (VU)';
+        badgeClass = 'bg-amber-500/25 text-amber-200 border border-amber-400/50';
+        alertClass = 'bg-amber-950/45 border-amber-500/40 text-amber-100';
+      }
+      return { stress, uicn, badgeClass, alertClass, metrics, narrative };
+    }
+
+    /* =========================================================================
+       DATOS SECCIÓN 2: 15 PREGUNTAS PRUEBA SABER (CICLOS BIOGEOQUÍMICOS)
+       - Longitud de opciones estrictamente homogénea (~128-144 caracteres)
+       - Sin opciones consecutivas iguales: [1,3,0,2,0,3,1,2,1,3,0,2,1,0,2]
+       - Sin parámetros ni prefijos dentro del texto de las respuestas
+       ========================================================================= */
+    const SABER_QUESTIONS = [
+      {
+        id: 1,
+        competency: 'Explicación de Fenómenos • Ciclo del Carbono',
+        molecule: 'CO2',
+        moleculeLabel: 'Dióxido de carbono (CO₂) • Geometría lineal CPK',
+        plateTheme: 'carbon_paramo',
+        context: 'En los páramos húmedos de Colombia, las bajas temperaturas y la saturación hídrica del suelo ralentizan la respiración microbiana aerobia, permitiendo acumular gruesas capas de materia orgánica parcialmente descompuesta llamadas turberas. Cuando estos suelos se drenan para establecer cultivos agrícolas de rotación, ingresa oxígeno atmosférico a los poros edáficos.',
+        stem: '¿Cuál alteración directa experimenta el ciclo biogeoquímico del carbono en el páramo inmediatamente después de drenar sus turberas?',
+        options: [
+          'Se detiene por completo la fotosíntesis de la vegetación herbácea mientras aumenta la precipitación de carbonatos insolubles profundos.',
+          'Se acelera la oxidación microbiana de la materia orgánica retenida liberando grandes volúmenes de dióxido de carbono hacia la atmósfera.',
+          'Se transforma espontáneamente el gas metano atmosférico en grafito mineral estable incrementando la reserva subterránea de combustibles.',
+          'Se incrementa la captura neta de carbono edáfico porque las raíces agrícolas fijan más biomasa leñosa permanente que los frailejones.'
+        ],
+        correct: 1
+      },
+      {
+        id: 2,
+        competency: 'Uso Comprensivo del Conocimiento • Ciclo del Nitrógeno',
+        molecule: 'NH3',
+        moleculeLabel: 'Amoníaco (NH₃) • Fijación biológica bacteriana',
+        plateTheme: 'nitrogen_dryforest',
+        context: 'Aunque el nitrógeno gaseoso representa cerca del setenta y ocho por ciento de la atmósfera terrestre, las plantas vasculares del bosque seco tropical colombiano no pueden asimilarlo directamente debido a la elevada estabilidad energética de su triple enlace covalente. Por ello dependen de árboles leguminosos nativos asociados con bacterias simbióticas del género Rhizobium.',
+        stem: '¿Qué transformación química esencial ejecutan estas bacterias radiculares para sostener la productividad primaria del bosque seco tropical?',
+        options: [
+          'Oxidan directamente los nitratos lixiviados del subsuelo profundo hasta convertirlos en óxido nitroso volátil aprovechable por estomas.',
+          'Descomponen las rocas ígneas ricas en silicatos minerales para liberar amonio gaseoso hacia las hojas superiores del dosel caducifolio.',
+          'Convierten las proteínas foliares senescentes en nitrógeno molecular inerte evitando la pérdida de nutrientes durante la época lluviosa.',
+          'Reducen enzimáticamente el nitrógeno molecular atmosférico hasta iones amonio asimilables para sintetizar aminoácidos y ácidos nucleicos.'
+        ],
+        correct: 3
+      },
+      {
+        id: 3,
+        competency: 'Indagación Científica • Ciclo del Fósforo',
+        molecule: 'PO4',
+        moleculeLabel: 'Ion Fosfato (PO₄³⁻) • Ciclo sedimentario sin fase gaseosa',
+        plateTheme: 'phosphorus_amazon',
+        context: 'A diferencia del carbono y del nitrógeno, el ciclo biogeoquímico del fósforo carece de un reservorio atmosférico gaseoso significativo en condiciones naturales. En la llanura amazónica colombiana, los suelos antiguos altamente meteorizados presentan concentraciones mínimas de fosfatos libres, pero sostienen selvas densas gracias a redes fúngicas de micorrizas superficiales.',
+        stem: '¿Por qué la tala rasa seguida de quema en la selva amazónica provoca un agotamiento casi irreversible del fósforo disponible en pocos años?',
+        options: [
+          'Porque al destruir la red de micorrizas las lluvias intensas lixivian los fosfatos de las cenizas sin reposición gaseosa atmosférica.',
+          'Porque el calor de las quemas volatiliza todo el fósforo orgánico hacia la estratosfera impidiendo su retorno mediante lluvias locales.',
+          'Porque las bacterias fijadoras del suelo dejan de captar fosfina atmosférica cuando desaparece la sombra protectora del dosel arbóreo.',
+          'Porque la radiación solar directa transforma instantáneamente el fosfato soluble en nitrato gaseoso que escapa hacia otras cordilleras.'
+        ],
+        correct: 0
+      },
+      {
+        id: 4,
+        competency: 'Explicación de Fenómenos • Ciclo Hidrológico',
+        molecule: 'H2O',
+        moleculeLabel: 'Agua (H₂O) • Puentes de hidrógeno y evapotranspiración',
+        plateTheme: 'water_flyingrivers',
+        context: 'Investigaciones hidroclimáticas en Sudamérica demuestran que millones de árboles del bosque húmedo amazónico extraen agua freática mediante sus raíces profundas y la liberan como vapor a través de la transpiración estomática. Los vientos alisios transportan estas enormes masas de humedad hasta chocar con el flanco oriental de la cordillera de los Andes en Colombia.',
+        stem: '¿Qué consecuencia regional generaría la deforestación masiva del piedemonte amazónico sobre el ciclo hidrológico de la región Andina?',
+        options: [
+          'Un incremento permanente del nivel freático en los páramos orientales debido a la menor absorción radicular de los bosques amazónicos.',
+          'Una salinización inmediata de las lluvias cordilleranas provocada por el arrastre eólico de minerales arcillosos desde suelos talados.',
+          'Una disminución marcada del aporte de vapor transpirado reduciendo las precipitaciones orográficas y el caudal de los embalses andinos.',
+          'Una congelación acelerada de las nubes bajas tropicales aumentando de manera sostenida la superficie glaciar en los nevados colombianos.'
+        ],
+        correct: 2
+      },
+      {
+        id: 5,
+        competency: 'Uso Comprensivo del Conocimiento • Eutrofización',
+        molecule: 'NO3',
+        moleculeLabel: 'Ion Nitrato (NO₃⁻) • Escorrentía agroindustrial',
+        plateTheme: 'eutrophication_lake',
+        context: 'En una laguna altoandina rodeada de cultivos intensivos de papa y cebolla, el monitoreo limnológico registró un aumento súbito de nitratos y ortofosfatos arrastrados por escorrentía superficial tras fuertes aguaceros. Dos semanas después se observó una densa capa verdosa superficial de microalgas y, posteriormente, una mortandad masiva de peces nativos durante la madrugada.',
+        stem: '¿Qué secuencia de procesos biogeoquímicos explica directamente el agotamiento del oxígeno disuelto que causó la muerte de los peces?',
+        options: [
+          'La descomposición bacteriana aerobia de la biomasa algal muerta consume el oxígeno profundo tras bloquearse el paso de luz solar.',
+          'La fijación fotosintética nocturna de las cianobacterias absorbe todo el oxígeno del agua para convertirlo en gas metano superficial.',
+          'La reacción química espontánea entre nitratos agrícolas y carbonatos lacustres precipita el oxígeno molecular hacia el sedimento.',
+          'La evaporación térmica generada por el color verde de las microalgas expulsa selectivamente los gases respiratorios hacia el aire.'
+        ],
+        correct: 0
+      },
+      {
+        id: 6,
+        competency: 'Explicación de Fenómenos • Ciclo del Azufre',
+        molecule: 'SO2',
+        moleculeLabel: 'Dióxido de azufre (SO₂) • Precursor de lluvia ácida',
+        plateTheme: 'sulfur_acidrain',
+        context: 'En corredores industriales cercanos a bosques altoandinos de niebla, la combustión continua de carbón mineral rico en pirita emite dióxido de azufre hacia la troposfera. En presencia de radiación solar, radicales hidroxilo y gotas de agua de las nubes, este compuesto experimenta oxidación química formando aerosoles ácidos que se depositan sobre el follaje y el suelo.',
+        stem: '¿De qué manera altera esta deposición ácida el equilibrio nutricional del suelo en los bosques de niebla receptores?',
+        options: [
+          'Neutraliza la acidez natural de la hojarasca favoreciendo una proliferación excesiva de lombrices y hongos descomponedores de lignina.',
+          'Incrementa la fijación abiótica de fósforo atmosférico fortaleciendo las paredes celulares de musgos, bromelias y orquídeas epífitas.',
+          'Estimula la formación instantánea de nódulos calcáreos en las raíces absorbiendo metales pesados sin afectar la fisiología vegetal.',
+          'Moviliza iones tóxicos de aluminio soluble y lixivia cationes esenciales como calcio y magnesio debilitando las raíces absorbentes.'
+        ],
+        correct: 3
+      },
+      {
+        id: 7,
+        competency: 'Indagación Científica • Ciclo del Carbono y Metano',
+        molecule: 'CH4',
+        moleculeLabel: 'Metano (CH₄) • Geometría tetraédrica de efecto invernadero',
+        plateTheme: 'methane_savanna',
+        context: 'Un equipo de ecólogos comparó el flujo de gases de efecto invernadero entre una sabana inundable conservada y una pastura de ganadería extensiva establecida tras talar bosque galería en la Orinoquía. Los sensores detectaron un incremento sustancial de metano atmosférico proveniente tanto de la fermentación entérica ruminal como de charcos compactados pobres en oxígeno.',
+        stem: '¿Qué condición metabólica comparten el rumen bovino y los suelos encharcados compactados para producir metano dentro del ciclo del carbono?',
+        options: [
+          'La presencia de luz ultravioleta filtrada que fotolisa los carbohidratos vegetales liberando hidrocarburos ligeros sin intervención viva.',
+          'La actividad de arqueas metanogénicas estrictamente anaerobias que reducen compuestos carbonados en ausencia de oxígeno molecular libre.',
+          'La abundancia de bacterias nitrificantes aerobias que oxidan celulosa fresca utilizando nitrógeno gaseoso como aceptor final electrónico.',
+          'La acumulación de sulfatos minerales cristalinos que deshidratan los ácidos grasos volátiles hasta transformarlos en gases inflamables.'
+        ],
+        correct: 1
+      },
+      {
+        id: 8,
+        competency: 'Uso Comprensivo del Conocimiento • Carbono Oceánico',
+        molecule: 'CO2',
+        moleculeLabel: 'Equilibrio CO₂ / Ácido Carbónico en arrecifes marinos',
+        plateTheme: 'ocean_acidification',
+        context: 'Los océanos tropicales actúan como importantes sumideros planetarios al absorber cerca de una cuarta parte del dióxido de carbono emitido por actividades humanas. Sin embargo, en los arrecifes coralinos del Caribe colombiano, el exceso de dióxido de carbono disuelto reacciona con el agua marina formando ácido carbónico que libera protones hidrógeno al medio.',
+        stem: '¿Por qué este desplazamiento químico amenaza directamente la integridad estructural de los arrecifes de coral en el mar Caribe?',
+        options: [
+          'Porque los protones adicionales oxidan la clorofila de las algas simbiontes convirtiendo el esqueleto calcáreo en sílice amorfa blanda.',
+          'Porque el ácido carbónico incrementa el pH superficial del agua precipitando exceso de sal marina sobre los pólipos filtradores vivos.',
+          'Porque los protones se combinan con iones carbonato formando bicarbonato y reduciendo el carbonato requerido para calcificar esqueletos.',
+          'Porque el dióxido de carbono disuelto bloquea la difusión branquial de nitrógeno líquido provocando asfixia inmediata en peces arrecifales.'
+        ],
+        correct: 2
+      },
+      {
+        id: 9,
+        competency: 'Explicación de Fenómenos • Manglares y Desnitrificación',
+        molecule: 'NH3',
+        moleculeLabel: 'Transformaciones redox del Nitrógeno en manglares',
+        plateTheme: 'mangrove_denitrification',
+        context: 'Los manglares del litoral Pacífico colombiano poseen sedimentos fangosos ricos en materia orgánica e inundados periódicamente por las mareas, lo que genera microambientes anóxicos a pocos milímetros de profundidad. Cuando aguas fluviales cargadas con nitratos residuales llegan al estuario, ciertas poblaciones bacterianas facultativas utilizan esos nitratos para respirar.',
+        stem: '¿Qué función reguladora cumple este proceso de desnitrificación bacteriana para la conservación de los ecosistemas marinos costeros?',
+        options: [
+          'Acumula nitratos concentrados dentro de las raíces zanco del mangle para impedir que los peces estuarinos consuman fitoplancton.',
+          'Retorna nitrógeno gaseoso hacia la atmósfera amortiguando el exceso de nutrientes disueltos que causaría eutrofización en aguas marinas.',
+          'Transforma el cloruro de sodio marino en fertilizante amoniacal soluble incrementando indefinidamente la salinidad del estuario costero.',
+          'Suprime totalmente la descomposición de hojas caídas permitiendo que el sedimento fangoso se convierta en roca fosfatada impermeable.'
+        ],
+        correct: 1
+      },
+      {
+        id: 10,
+        competency: 'Indagación Científica • Lixiviación en Chocó Biogeográfico',
+        molecule: 'H2O',
+        moleculeLabel: 'Escorrentía pluvial y lavado de nutrientes edáficos',
+        plateTheme: 'choco_leaching',
+        context: 'El Chocó biogeográfico registra algunas de las precipitaciones anuales más elevadas del planeta, superando en varias localidades los ocho mil milímetros de lluvia al año. En parcelas experimentales donde se removió completamente la cubierta forestal para minería a cielo abierto, los análisis edáficos mostraron una caída del ochenta por ciento en potasio, calcio y nitratos en seis meses.',
+        stem: '¿Qué mecanismo físico-biológico mantenía retenidos estos nutrientes dentro del ecosistema antes de remover la cobertura vegetal nativa?',
+        options: [
+          'La impermeabilidad absoluta del subsuelo granítico que impedía cualquier infiltración vertical del agua lluvia hacia capas profundas.',
+          'La evaporación instantánea de las gotas de lluvia antes de tocar el suelo gracias al calor geotérmico emitido por las raíces arbóreas.',
+          'La cristalización permanente de las sales minerales sobre los troncos vivos evitando su disolución frente a la escorrentía superficial.',
+          'La interceptación física del dosel estratificado junto con la absorción inmediata de iones reciclados por raíces finas y hongos edáficos.'
+        ],
+        correct: 3
+      },
+      {
+        id: 11,
+        competency: 'Explicación de Fenómenos • Biogeoquímica y Mercurio',
+        molecule: 'SO2',
+        moleculeLabel: 'Bacterias sulfatorreductoras y metilación en sedimentos',
+        plateTheme: 'mercury_wetland',
+        context: 'En ciénagas aluviales del bajo Cauca y San Jorge afectadas por vertimientos de mercurio metálico, el riesgo toxicológico más grave ocurre en sedimentos anóxicos ricos en sulfatos y materia orgánica. Allí, bacterias sulfatorreductoras asociadas al ciclo del azufre transforman accidentalmente el mercurio inorgánico en metilmercurio orgánico liposoluble.',
+        stem: '¿Cuál es el efecto ecológico de esta transformación biogeoquímica a lo largo de los niveles tróficos de la ciénaga?',
+        options: [
+          'El metilmercurio se biomagnifica progresivamente desde el plancton hasta alcanzar concentraciones neurotóxicas máximas en peces ictiófagos.',
+          'El compuesto orgánico resultante se evapora de inmediato sin ingresar a los tejidos animales limpiando por completo los sedimentos fluviales.',
+          'Las plantas acuáticas flotantes utilizan el metilmercurio como micronutriente fotosintético acelerando la oxigenación profunda del agua.',
+          'La concentración del metal disminuye en cada eslabón alimentario porque los depredadores superiores lo excretan más rápido que las algas.'
+        ],
+        correct: 0
+      },
+      {
+        id: 12,
+        competency: 'Uso Comprensivo del Conocimiento • Carbono Azul',
+        molecule: 'CO2',
+        moleculeLabel: 'Secuestro de Carbono Azul en praderas marinas',
+        plateTheme: 'blue_carbon_guajira',
+        context: 'Las praderas de pastos marinos de Thalassia testudinum en la península de La Guajira y los bosques de manglar costeros son denominados ecosistemas de carbono azul. Mediciones comparativas revelan que, por unidad de superficie, estos ambientes marinos costeros almacenan hasta cuatro veces más carbono a largo plazo que muchos bosques continentales terrestres.',
+        stem: '¿A qué propiedad biogeoquímica fundamental se debe la extraordinaria capacidad de almacenamiento duradero en estos ecosistemas costeros?',
+        options: [
+          'A que sus hojas carecen de respiración celular mitocondrial durante la noche acumulando glucosa pura sin liberar dióxido de carbono.',
+          'A que las corrientes marinas cálidas convierten instantáneamente toda la celulosa vegetal caída en arrecifes minerales de cuarzo blanco.',
+          'A que sus raíces atrapan sedimentos finos anóxicos donde la descomposición orgánica es muy lenta conservando carbono durante siglos.',
+          'A que la salinidad elevada impide la existencia de cualquier bacteria marina deteniendo por completo todos los ciclos biogeoquímicos.'
+        ],
+        correct: 2
+      },
+      {
+        id: 13,
+        competency: 'Indagación Científica • Incendios y Ciclos Acoplados',
+        molecule: 'NO3',
+        moleculeLabel: 'Volatilización de Nitrógeno vs. Cenizas Minerales',
+        plateTheme: 'fire_cycles',
+        context: 'Durante temporadas intensas del fenómeno de El Niño en Colombia, los incendios forestales consumen extensas áreas de vegetación andina y sabanas arboladas. Al analizar químicamente las parcelas recién quemadas, los investigadores encuentran que gran parte del carbono y del nitrógeno desapareció como gases, mientras que el fósforo y el calcio permanecen inicialmente en la ceniza.',
+        stem: '¿Por qué ambos grupos de bioelementos se comportan de manera tan distinta durante la combustión de la biomasa vegetal?',
+        options: [
+          'Porque el fósforo y el calcio poseen pesos atómicos idénticos al oxígeno impidiendo su reacción térmica durante las llamas intensas.',
+          'Porque carbono y nitrógeno forman óxidos gaseosos volátiles a bajas temperaturas mientras fósforo y calcio generan sales minerales fijas.',
+          'Porque las cenizas absorben selectivamente fósforo gaseoso del aire circundante inmediatamente después de extinguirse el fuego superficial.',
+          'Porque el nitrógeno foliar se transforma en roca silicatada subterránea antes de que el frente térmico alcance las copas de los árboles.'
+        ],
+        correct: 1
+      },
+      {
+        id: 14,
+        competency: 'Uso Comprensivo del Conocimiento • Meteorización',
+        molecule: 'PO4',
+        moleculeLabel: 'Liberación geológica de Fosfatos por meteorización',
+        plateTheme: 'weathering_cordillera',
+        context: 'El levantamiento tectónico de las tres cordilleras colombianas expuso antiguas formaciones marinas sedimentarias ricas en apatito y rocas fosfatadas a la acción combinada de lluvias, cambios térmicos y ácidos orgánicos secretados por líquenes y raíces pioneras. Este proceso lento constituye la puerta de entrada natural de un bioelemento clave hacia las cadenas tróficas terrestres.',
+        stem: '¿Qué papel cumple esta meteorización físico-química dentro de la dinámica global del ciclo del fósforo en los ecosistemas continentales?',
+        options: [
+          'Reincorpora gradualmente iones fosfato solubles desde la litosfera hacia el suelo compensando las pérdidas por arrastre hacia el océano.',
+          'Sintetiza nuevas moléculas de fósforo a partir de nitrógeno atmosférico mediante descargas eléctricas frecuentes en las cumbres andinas.',
+          'Impide que los ríos cordilleranos transporten minerales disueltos hacia las llanuras aluviales manteniendo estériles los valles bajos.',
+          'Libera grandes cantidades de gas fosfano fotosintético indispensable para que los musgos altoandinos regulen la humedad ambiental.'
+        ],
+        correct: 0
+      },
+      {
+        id: 15,
+        competency: 'Explicación de Fenómenos • Regulación Microclimática',
+        molecule: 'H2O',
+        moleculeLabel: 'Calor latente y condensación en bosque altoandino',
+        plateTheme: 'cloud_forest_water',
+        context: 'Los bosques altoandinos de niebla ubicados entre dos mil cuatrocientos y tres mil metros de altitud en Colombia presentan árboles cubiertos densamente por musgos, líquenes y bromelias epífitas. Incluso en semanas sin lluvia vertical directa, los suelos bajo estos bosques conservan alta humedad y alimentan quebradas cristalinas permanentes.',
+        stem: '¿Qué interacción entre la estructura biótica del bosque y el ciclo del agua explica el mantenimiento continuo de dichas quebradas?',
+        options: [
+          'Las raíces profundas perforan el manto magmático extrayendo vapor juvenil primario que se condensa al contacto con rocas superficiales.',
+          'La descomposición acelerada de troncos caídos produce agua metabólica suficiente para sostener ríos caudalosos durante todo el año seco.',
+          'El follaje y las epífitas interceptan gotículas de niebla horizontal canalizando el agua condensada hacia el suelo esponjoso sombreado.',
+          'Las hojas coriáceas reflejan toda la humedad atmosférica hacia estratos superiores provocando granizadas diarias exclusivas del bosque.'
+        ],
+        correct: 2
+      }
+    ];
+
+    /* =========================================================================
+       DATOS SECCIÓN 3: 5 ROLES FRENTE A CONTAMINACIÓN AMBIENTAL BIOGEOQUÍMICA
+       ========================================================================= */
+    const ROLE_CASES = [
+      {
+        id: 1,
+        roleTitle: 'Rol 1: Hidrólogo Limnólogo del IDEAM',
+        cycleTag: 'Ciclos de Nitrógeno y Fósforo',
+        plateTheme: 'role_cienaga',
+        caseTitle: 'Crisis de Eutrofización y Mortandad Íctica en Complejo Cenagoso del Caribe',
+        scenario: 'Como hidrólogo líder del IDEAM, recibes reportes urgentes de pescadores artesanales en un complejo cenagoso alimentado por caños agrícolas donde se aplican fertilizantes sintéticos NPK en exceso. Los sensores registran floraciones masivas de cianobacterias superficiales, turbidez extrema, olor a sulfuro y niveles de oxígeno disuelto inferiores a 1.2 mg/L a las 5:00 a. m., con miles de peces muertos.',
+        prompt: 'Desde tu rol técnico en el IDEAM: (1) Explica detalladamente cómo el ingreso excesivo de nitratos y fosfatos alteró los ciclos biogeoquímicos hasta provocar anoxia nocturna, y (2) diseña dos acciones concretas de restauración y manejo en la cuenca agrícola para recuperar el estado de conservación del humedal.',
+        keywords: ['nitrato', 'fosfato', 'algas', 'cianobacteria', 'oxigeno', 'descomposicion', 'anoxia', 'eutrofizacion', 'fertilizante', 'humedal', 'franja', 'tratamiento']
+      },
+      {
+        id: 2,
+        roleTitle: 'Rol 2: Ecólogo de Alta Montaña - Instituto Humboldt',
+        cycleTag: 'Ciclos del Carbono e Hidrológico',
+        plateTheme: 'role_paramo',
+        caseTitle: 'Drenaje y Oxidación de Turberas Milenarias en Páramo Andino',
+        scenario: 'Como investigador del Instituto Humboldt, inspeccionas un sector de páramo a 3.450 m s. n. m. donde se abrieron zanjas de drenaje y se quemaron frailejones para ampliar cultivos y pastoreo. El suelo negro esponjoso de turbera ahora luce seco, agrietado y hidrofóbico, mientras el acueducto municipal aguas abajo reporta una reducción del 45% en su caudal durante la temporada seca.',
+        prompt: 'Desde tu rol científico en el Instituto Humboldt: (1) Argumenta por qué el drenaje convierte las turberas de sumideros a fuentes contaminantes de CO₂ alterando simultáneamente la regulación hídrica, y (2) propón un protocolo de restauración ecológica con participación campesina.',
+        keywords: ['turbera', 'carbono', 'oxidacion', 'agua', 'frailejon', 'caudal', 'infiltracion', 'atmosfera', 'sumidero', 'restauracion', 'zanja', 'suelo']
+      },
+      {
+        id: 3,
+        roleTitle: 'Rol 3: Ingeniero de Calidad Atmosférica (CAR)',
+        cycleTag: 'Ciclos del Azufre y del Nitrógeno',
+        plateTheme: 'role_acidrain',
+        caseTitle: 'Deposición Ácida sobre Relictos de Bosque Altoandino de Niebla',
+        scenario: 'Como ingeniero ambiental de la Corporación Autónoma Regional, detectas que la niebla y la lluvia en una reserva forestal ubicada a sotavento de un corredor termoeléctrico y ladrillero presentan valores de pH de 4.1. Los árboles nativos muestran clorosis foliar, pérdida prematura de hojas, muerte de líquenes bioindicadores y toxicidad por aluminio libre en el suelo.',
+        prompt: 'Desde tu rol de autoridad ambiental: (1) Explica las transformaciones químicas atmosféricas de los óxidos de azufre (SO₂) y nitrógeno (NOₓ) hasta formar lluvia ácida y su impacto edáfico, y (2) establece las medidas tecnológicas y normativas obligatorias para las industrias emisoras.',
+        keywords: ['azufre', 'acido', 'sulfuric', 'nitric', 'ph', 'aluminio', 'calcio', 'lixiviacion', 'emision', 'filtro', 'combustion', 'bosque']
+      },
+      {
+        id: 4,
+        roleTitle: 'Rol 4: Biólogo Marino Investigador - INVEMAR',
+        cycleTag: 'Ciclo Oceánico del Carbono',
+        plateTheme: 'role_coral',
+        caseTitle: 'Acidificación Costera y Estrés Térmico en Arrecifes del Caribe Colombiano',
+        scenario: 'Como biólogo marino del INVEMAR monitoreando arrecifes coralinos insulares, documentas una caída progresiva del pH superficial marino acompañada de anomalías térmicas y aportes de aguas servidas costeras sin tratar. El 55% de las colonias de corales pétreos presenta blanqueamiento severo y fragilidad esquelética, reduciendo el refugio de peces comerciales.',
+        prompt: 'Desde tu rol en el INVEMAR: (1) Sustenta químicamente cómo el incremento de CO₂ disuelto reduce la disponibilidad de iones carbonato afectando la calcificación coralina y la red trófica arrecifal, y (2) plantea estrategias locales y globales para aumentar la resiliencia del arrecife.',
+        keywords: ['carbono', 'carbonato', 'bicarbonato', 'calcificacion', 'ph', 'coral', 'blanqueamiento', 'simbiosis', 'zooxantela', 'arrecife', 'acido', 'marino']
+      },
+      {
+        id: 5,
+        roleTitle: 'Rol 5: Coordinador de Restauración Agroecológica en Córdoba',
+        cycleTag: 'Ciclos de Carbono, Metano y Nitrógeno',
+        plateTheme: 'role_sinu',
+        caseTitle: 'Degradación del Bosque Seco Tropical por Ganadería Extensiva y Quemas',
+        scenario: 'Como coordinador de restauración agroecológica en la cuenca del río Sinú, evalúas fincas ganaderas establecidas sobre antiguos bosques secos tropicales donde se realizan quemas anuales de pastizales, existe compactación severa del suelo, alta emisión de metano (CH₄) y óxido nitroso (N₂O), y pérdida crítica de conectividad entre fragmentos boscosos.',
+        prompt: 'Desde tu rol agroecológico: (1) Analiza cómo las quemas y el sobrepastoreo desacoplan los ciclos del carbono y del nitrógeno acelerando la degradación del bioma, y (2) sustenta cómo la implementación de sistemas silvopastoriles con leguminosas restaura ambos ciclos y la biodiversidad.',
+        keywords: ['metano', 'quema', 'silvopastoril', 'leguminosa', 'nitrogeno', 'carbono', 'compactacion', 'bosque', 'corredor', 'fijacion', 'suelo', 'biodiversidad']
+      }
+    ];
+
+    /* =========================================================================
+       ESTADO GLOBAL DE LA APLICACIÓN Y PERSISTENCIA
+       ========================================================================= */
+    let appState = {
+      started: false,
+      finished: false,
+      studentId: '',
+      studentName: '',
+      studentGroup: '10° A',
+      startTimeISO: null,
+      endTimeISO: null,
+      remainingSeconds: EXAM_CONFIG.totalDurationSeconds,
+      currentSection: 1,
+      currentSimIndex: 0,
+      currentSaberIndex: 0,
+      currentRoleIndex: 0,
+      simData: {
+        paramo: { vars: { tempDelta: 0.5, agriFrontier: 10, frailejonCover: 90 }, changes: 0, justification: '' },
+        bosque_seco: { vars: { deforestation: 15, droughtMonths: 4, corridors: 80 }, changes: 0, justification: '' },
+        selva_humeda: { vars: { clearcut: 10, mercuryMining: 5, evapoRate: 95 }, changes: 0, justification: '' }
+      },
+      saberAnswers: Array(15).fill(null),
+      saberReadUnlocked: Array(15).fill(false),
+      roleAnswers: Array(5).fill(''),
+      penalties: [],
+      totalPenaltyPoints: 0,
+      copyWarnedOnce: false,
+      fsExitCount: 0
+    };
+
+    let globalInterval = null;
+    let saberReadTimer = null;
+    let saberSecondsLeft = 0;
+    let lastUserActivity = Date.now();
+    let lastNoisePenaltyTime = 0;
+    let audioContextRef = null;
+    const plateCache = {};
+
+    /* =========================================================================
+       GENERADOR DE BANNER OFICIAL E IMÁGENES CIENTÍFICAS .PNG HD (900x600)
+       ========================================================================= */
+    function generateOfficialBannerDataURL() {
+      const c = document.createElement('canvas');
+      c.width = 1400;
+      c.height = 280;
+      const ctx = c.getContext('2d');
+
+      const grad = ctx.createLinearGradient(0, 0, 1400, 280);
+      grad.addColorStop(0, '#06152d');
+      grad.addColorStop(0.55, '#0f2b54');
+      grad.addColorStop(1, '#09203f');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1400, 280);
+
+      // Franjas doradas institucionales
+      ctx.fillStyle = '#dfb235';
+      ctx.fillRect(0, 0, 1400, 10);
+      ctx.fillRect(0, 270, 1400, 10);
+
+      // Decoración geométrica científica derecha
+      ctx.save();
+      ctx.globalAlpha = 0.14;
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 3;
+      for (let i = 0; i < 6; i++) {
+        ctx.beginPath();
+        ctx.arc(1240, 140, 45 + i * 28, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Escudo Institucional Faro de Luz
+      ctx.save();
+      ctx.translate(115, 140);
+      ctx.beginPath();
+      ctx.arc(0, 0, 82, 0, Math.PI * 2);
+      ctx.fillStyle = '#081b38';
+      ctx.fill();
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = '#dfb235';
+      ctx.stroke();
+
+      // Rayos del faro
+      ctx.fillStyle = 'rgba(223, 178, 53, 0.32)';
+      ctx.beginPath();
+      ctx.moveTo(0, -28);
+      ctx.lineTo(-68, -56);
+      ctx.lineTo(-68, -8);
+      ctx.closePath();
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(0, -28);
+      ctx.lineTo(68, -56);
+      ctx.lineTo(68, -8);
+      ctx.closePath();
+      ctx.fill();
+
+      // Torre del faro
+      ctx.fillStyle = '#f8fafc';
+      ctx.beginPath();
+      ctx.moveTo(-16, 48);
+      ctx.lineTo(-10, -22);
+      ctx.lineTo(10, -22);
+      ctx.lineTo(16, 48);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#c89d28';
+      ctx.fillRect(-13, 2, 26, 12);
+      ctx.fillRect(-15, 26, 30, 12);
+      ctx.beginPath();
+      ctx.arc(0, -30, 11, 0, Math.PI * 2);
+      ctx.fillStyle = '#fde047';
+      ctx.fill();
+
+      ctx.fillStyle = '#dfb235';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('THE LIGHTHOUSE', 0, 68);
+      ctx.restore();
+
+      // Textos principales
+      ctx.fillStyle = '#dfb235';
+      ctx.font = '800 18px Plus Jakarta Sans, sans-serif';
+      ctx.fillText('MANANTIAL DE DIOS • GIMNASIO CRISTIANO FARO DE LUZ', 235, 68);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '800 34px Plus Jakarta Sans, sans-serif';
+      ctx.fillText(EXAM_CONFIG.examTitle, 235, 122);
+
+      ctx.fillStyle = '#93c5fd';
+      ctx.font = '600 20px Plus Jakarta Sans, sans-serif';
+      ctx.fillText('Ciencias Naturales y Educación Ambiental • Estado de Conservación y Ciclos Biogeoquímicos', 235, 165);
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '600 17px Plus Jakarta Sans, sans-serif';
+      ctx.fillText('Docente: Cristian David Ayazo  |  Grado Décimo (10°)  |  Escala: 1.0 a 5.0 (Aprueba: ' + EXAM_CONFIG.passingGrade.toFixed(1) + ')', 235, 208);
+
+      // Caja código calidad
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      ctx.strokeStyle = '#dfb235';
+      ctx.lineWidth = 2;
+      ctx.fillRect(1110, 28, 255, 58);
+      ctx.strokeRect(1110, 28, 255, 58);
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = 'bold 14px monospace';
+      ctx.fillText('CÓDIGO: F-GA2-004', 1130, 53);
+      ctx.fillStyle = '#dfb235';
+      ctx.fillText('VERSIÓN: 2 | 45 MIN', 1130, 74);
+
+      return c.toDataURL('image/png');
+    }
+
+    // Generador de láminas científicas .PNG en alta definición (900x600)
+    function generateScientificPlatePNG(theme, dynamicState) {
+      const cacheKey = dynamicState ? null : theme;
+      if (cacheKey && plateCache[cacheKey]) return plateCache[cacheKey];
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 900;
+      canvas.height = 600;
+      const ctx = canvas.getContext('2d');
+
+      // Paletas atmosféricas por tema
+      const isMarine = theme.includes('ocean') || theme.includes('coral') || theme.includes('guajira') || theme.includes('mangrove');
+      const isDry = theme.includes('dry') || theme.includes('savanna') || theme.includes('fire') || theme.includes('sinu') || theme === 'bosque_seco';
+      const isAcid = theme.includes('sulfur') || theme.includes('acid') || theme.includes('mercury');
+
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, 360);
+      if (isAcid) {
+        skyGrad.addColorStop(0, '#1e293b');
+        skyGrad.addColorStop(1, '#475569');
+      } else if (isDry) {
+        skyGrad.addColorStop(0, '#7c2d12');
+        skyGrad.addColorStop(0.5, '#d97706');
+        skyGrad.addColorStop(1, '#fde68a');
+      } else if (isMarine) {
+        skyGrad.addColorStop(0, '#0c4a6e');
+        skyGrad.addColorStop(0.55, '#0284c7');
+        skyGrad.addColorStop(1, '#38bdf8');
+      } else {
+        skyGrad.addColorStop(0, '#082f49');
+        skyGrad.addColorStop(0.55, '#0369a1');
+        skyGrad.addColorStop(1, '#bae6fd');
+      }
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, 900, 600);
+
+      // Sol o nubes reactivas
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(760, 105, 46, 0, Math.PI * 2);
+      ctx.fillStyle = isAcid ? 'rgba(251, 191, 36, 0.45)' : 'rgba(253, 224, 71, 0.9)';
+      ctx.fill();
+      ctx.restore();
+
+      // Cordilleras de fondo
+      ctx.fillStyle = isDry ? '#78350f' : '#0f3d3e';
+      ctx.beginPath();
+      ctx.moveTo(0, 360);
+      ctx.lineTo(140, 210);
+      ctx.lineTo(310, 300);
+      ctx.lineTo(490, 175);
+      ctx.lineTo(690, 285);
+      ctx.lineTo(840, 195);
+      ctx.lineTo(900, 260);
+      ctx.lineTo(900, 390);
+      ctx.lineTo(0, 390);
+      ctx.closePath();
+      ctx.fill();
+
+      // Suelo / Hidrosfera
+      const groundGrad = ctx.createLinearGradient(0, 355, 0, 600);
+      if (isMarine) {
+        groundGrad.addColorStop(0, '#0369a1');
+        groundGrad.addColorStop(0.6, '#082f49');
+        groundGrad.addColorStop(1, '#1e293b');
+      } else if (isDry) {
+        groundGrad.addColorStop(0, '#a16207');
+        groundGrad.addColorStop(0.5, '#713f12');
+        groundGrad.addColorStop(1, '#292524');
+      } else {
+        groundGrad.addColorStop(0, '#065f46');
+        groundGrad.addColorStop(0.5, '#3f2e21');
+        groundGrad.addColorStop(1, '#1c1917');
+      }
+      ctx.fillStyle = groundGrad;
+      ctx.fillRect(0, 355, 900, 245);
+
+      // Cuerpo acuático lateral o central
+      ctx.fillStyle = isAcid ? 'rgba(20, 184, 166, 0.55)' : 'rgba(14, 165, 233, 0.78)';
+      ctx.beginPath();
+      ctx.moveTo(460, 370);
+      ctx.quadraticCurveTo(660, 415, 900, 380);
+      ctx.lineTo(900, 515);
+      ctx.quadraticCurveTo(640, 505, 430, 445);
+      ctx.closePath();
+      ctx.fill();
+
+      // Elementos ecológicos dinámicos (árboles, frailejones, corales, nubes)
+      let vegDensity = 12;
+      let stressFactor = 0.15;
+      if (dynamicState) {
+        stressFactor = dynamicState.stress / 100;
+        vegDensity = Math.max(2, Math.round(16 * (1 - stressFactor * 0.8)));
+      }
+
+      for (let i = 0; i < vegDensity; i++) {
+        const vx = 55 + i * (390 / Math.max(1, vegDensity));
+        const vy = 358 + (i % 3) * 14;
+        if (theme === 'paramo' || theme.includes('paramo')) {
+          // Frailejones (Espeletia)
+          ctx.fillStyle = '#78350f';
+          ctx.fillRect(vx - 4, vy - 38, 8, 38);
+          ctx.fillStyle = stressFactor > 0.6 ? '#a16207' : '#84cc16';
+          for (let a = 0; a < 9; a++) {
+            const ang = (a / 9) * Math.PI * 2;
+            ctx.beginPath();
+            ctx.ellipse(vx + Math.cos(ang) * 12, vy - 42 + Math.sin(ang) * 7, 12, 4, ang, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else if (isMarine) {
+          // Corales y pastos marinos
+          ctx.fillStyle = theme.includes('coral') ? '#fb7185' : '#10b981';
+          ctx.beginPath();
+          ctx.arc(520 + i * 28, 465, 14, Math.PI, 0);
+          ctx.fill();
+        } else {
+          // Árboles tropicales
+          ctx.fillStyle = '#57361a';
+          ctx.fillRect(vx - 5, vy - 54, 10, 54);
+          ctx.fillStyle = isDry && stressFactor > 0.45 ? '#ca8a04' : '#10b981';
+          ctx.beginPath();
+          ctx.arc(vx, vy - 64, 24, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Nubes y precipitación
+      drawCloud(ctx, 210, 95, isAcid ? '#94a3b8' : '#f8fafc');
+      drawCloud(ctx, 520, 82, isAcid ? '#64748b' : '#e2e8f0');
+
+      // Flechas vectoriales de flujos biogeoquímicos según el tema
+      const diagramSpec = getDiagramLabels(theme, dynamicState);
+      ctx.lineWidth = 3.5;
+      diagramSpec.arrows.forEach((ar) => {
+        drawFluxArrow(ctx, ar.x1, ar.y1, ar.x2, ar.y2, ar.color, ar.label);
+      });
+
+      // Banda técnica superior e inferior en la lámina
+      ctx.fillStyle = 'rgba(8, 27, 56, 0.86)';
+      ctx.fillRect(0, 0, 900, 44);
+      ctx.fillStyle = '#dfb235';
+      ctx.font = 'bold 16px Plus Jakarta Sans, sans-serif';
+      ctx.fillText('LÁMINA CIENTÍFICA HD • ' + diagramSpec.title, 20, 28);
+
+      ctx.fillStyle = 'rgba(8, 27, 56, 0.9)';
+      ctx.fillRect(0, 546, 900, 54);
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = '600 14px Plus Jakarta Sans, sans-serif';
+      ctx.fillText(diagramSpec.footer, 20, 578);
+
+      const url = canvas.toDataURL('image/png');
+      if (cacheKey) plateCache[cacheKey] = url;
+      return url;
+    }
+
+    function drawCloud(ctx, cx, cy, color) {
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.88;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 26, 0, Math.PI * 2);
+      ctx.arc(cx + 28, cy - 8, 32, 0, Math.PI * 2);
+      ctx.arc(cx + 60, cy, 24, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawFluxArrow(ctx, x1, y1, x2, y2, color, label) {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+
+      const angle = Math.atan2(y2 - y1, x2 - x1);
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - 14 * Math.cos(angle - Math.PI / 6), y2 - 14 * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(x2 - 14 * Math.cos(angle + Math.PI / 6), y2 - 14 * Math.sin(angle + Math.PI / 6));
+      ctx.closePath();
+      ctx.fill();
+
+      const mx = (x1 + x2) / 2;
+      const my = (y1 + y2) / 2;
+      ctx.font = 'bold 13px Plus Jakarta Sans, sans-serif';
+      const tw = ctx.measureText(label).width + 16;
+      ctx.fillStyle = 'rgba(6, 18, 38, 0.88)';
+      ctx.fillRect(mx - tw / 2, my - 13, tw, 24);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(mx - tw / 2, my - 13, tw, 24);
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.fillText(label, mx, my + 4);
+      ctx.restore();
+    }
+
+    function getDiagramLabels(theme, dynamicState) {
+      if (dynamicState) {
+        const st = Math.round(dynamicState.stress);
+        return {
+          title: theme.toUpperCase() + ' | ÍNDICE DE PERTURBACIÓN: ' + st + '%',
+          footer: 'Monitoreo Ecológico en Tiempo Real • Categoría Actual: ' + dynamicState.uicn,
+          arrows: [
+            { x1: 220, y1: 145, x2: 220, y2: 315, color: '#38bdf8', label: 'Entrada Hídrica / Solar' },
+            { x1: 310, y1: 330, x2: 430, y2: 170, color: st > 50 ? '#fb7185' : '#34d399', label: st > 50 ? 'Pérdida de CO₂ / Erosión' : 'Captura CO₂ y Regulación' },
+            { x1: 420, y1: 430, x2: 670, y2: 445, color: '#fbbf24', label: 'Flujo de Nutrientes a Cuenca' }
+          ]
+        };
+      }
+      const map = {
+        carbon_paramo: {
+          title: 'DINÁMICA DE TURBERAS Y OXIDACIÓN EDÁFICA EN PÁRAMO',
+          footer: 'Reservorios: Atmósfera (CO₂) ⇄ Biomasa de Espeletia ⇄ Suelo Orgánico de Turbera (O₂ / Drenaje)',
+          arrows: [
+            { x1: 190, y1: 155, x2: 190, y2: 310, color: '#34d399', label: 'Fotosíntesis (CO₂)' },
+            { x1: 340, y1: 470, x2: 340, y2: 185, color: '#fb7185', label: 'Drenaje → Oxidación a CO₂' },
+            { x1: 540, y1: 130, x2: 430, y2: 390, color: '#38bdf8', label: 'Ingreso O₂ por Zanjas' }
+          ]
+        },
+        nitrogen_dryforest: {
+          title: 'SIMBIOSIS RHIZOBIUM-LEGUMINOSA EN BOSQUE SECO TROPICAL',
+          footer: 'Transformación clave: N₂ atmosférico (triple enlace) → Fijación enzimática → NH₄⁺ asimilable',
+          arrows: [
+            { x1: 230, y1: 145, x2: 230, y2: 420, color: '#60a5fa', label: 'N₂ Atmosférico (78%)' },
+            { x1: 250, y1: 465, x2: 470, y2: 355, color: '#34d399', label: 'Rhizobium: NH₄⁺ → Aminoácidos' },
+            { x1: 520, y1: 330, x2: 330, y2: 440, color: '#fbbf24', label: 'Hojarasca Rica en N' }
+          ]
+        },
+        phosphorus_amazon: {
+          title: 'CICLO SEDIMENTARIO DEL FÓSFORO Y MICORRIZAS AMAZÓNICAS',
+          footer: 'Sin fase gaseosa atmosférica: el reciclaje superficial evita la pérdida por lixiviación pluvial',
+          arrows: [
+            { x1: 200, y1: 320, x2: 350, y2: 430, color: '#fbbf24', label: 'Mineralización PO₄³⁻' },
+            { x1: 370, y1: 435, x2: 210, y2: 335, color: '#34d399', label: 'Reabsorción Micorrízica' },
+            { x1: 450, y1: 420, x2: 730, y2: 470, color: '#fb7185', label: 'Tala → Lixiviación de PO₄³⁻' }
+          ]
+        },
+        water_flyingrivers: {
+          title: 'EVAPOTRANSPIRACIÓN AMAZÓNICA Y RÍOS VOLADORES ANDINOS',
+          footer: 'Acoplamiento bosque-atmósfera: bombeo biótico de vapor desde la cuenca amazónica hacia los Andes',
+          arrows: [
+            { x1: 210, y1: 320, x2: 280, y2: 135, color: '#38bdf8', label: 'Transpiración Dosel (H₂O)' },
+            { x1: 320, y1: 120, x2: 640, y2: 140, color: '#60a5fa', label: 'Transporte Alisio a Andes' },
+            { x1: 650, y1: 165, x2: 650, y2: 370, color: '#2dd4bf', label: 'Lluvia Orográfica' }
+          ]
+        },
+        eutrophication_lake: {
+          title: 'EUTROFIZACIÓN CULTURAL EN HUMEDALES Y LAGUNAS ANDINAS',
+          footer: 'Escorrentía NPK → Proliferación de microalgas → Sombra subacuática → Descomposición aerobia y Anoxia',
+          arrows: [
+            { x1: 220, y1: 375, x2: 530, y2: 410, color: '#fbbf24', label: 'Escorrentía NO₃⁻ y PO₄³⁻' },
+            { x1: 650, y1: 390, x2: 650, y2: 495, color: '#34d399', label: 'Sedimentación Biomasa Algal' },
+            { x1: 740, y1: 490, x2: 740, y2: 405, color: '#fb7185', label: 'Caída Crítica de O₂ Disuelto' }
+          ]
+        },
+        sulfur_acidrain: {
+          title: 'OXIDACIÓN TROPOSFÉRICA DE SO₂ Y DEPOSICIÓN ÁCIDA',
+          footer: 'Combustión de carbón → SO₂ + OH• + H₂O → H₂SO₄ → Lixiviación de Ca²⁺/Mg²⁺ y liberación de Al³⁺',
+          arrows: [
+            { x1: 170, y1: 340, x2: 260, y2: 130, color: '#f97316', label: 'Emisión Industrial SO₂' },
+            { x1: 310, y1: 115, x2: 520, y2: 125, color: '#fbbf24', label: 'Oxidación a H₂SO₄' },
+            { x1: 540, y1: 155, x2: 420, y2: 430, color: '#fb7185', label: 'Lluvia Ácida → Al³⁺ Soluble' }
+          ]
+        },
+        methane_savanna: {
+          title: 'METANOGÉNESIS EN PASTURAS COMPACTADAS Y FERMENTACIÓN',
+          footer: 'Ambientes estrictamente anaerobios: arqueas metanogénicas reducen sustratos carbonados hacia CH₄',
+          arrows: [
+            { x1: 240, y1: 455, x2: 240, y2: 170, color: '#fb7185', label: 'Suelo Anóxico → Emisión CH₄' },
+            { x1: 460, y1: 365, x2: 460, y2: 165, color: '#f97316', label: 'Fermentación Ruminal CH₄' },
+            { x1: 640, y1: 155, x2: 640, y2: 330, color: '#fde047', label: 'Forzamiento Invernadero' }
+          ]
+        },
+        ocean_acidification: {
+          title: 'ACIDIFICACIÓN MARINA Y EQUILIBRIO DE CARBONATOS EN CORALES',
+          footer: 'CO₂(ac) + H₂O ⇌ H₂CO₃ ⇌ H⁺ + HCO₃⁻  |  Los protones H⁺ consumen CO₃²⁻ frenando el CaCO₃',
+          arrows: [
+            { x1: 280, y1: 140, x2: 520, y2: 390, color: '#fb7185', label: 'Absorción Excesiva de CO₂' },
+            { x1: 560, y1: 420, x2: 760, y2: 420, color: '#fbbf24', label: 'H⁺ + CO₃²⁻ → HCO₃⁻' },
+            { x1: 660, y1: 445, x2: 660, y2: 515, color: '#38bdf8', label: 'Déficit de CaCO₃ Coralino' }
+          ]
+        }
+      };
+      return map[theme] || {
+        title: 'INTERACCIÓN BIOGEOQUÍMICA Y CONSERVACIÓN DE ECOSISTEMAS',
+        footer: 'Flujos acoplados de materia y energía entre atmósfera, biosfera, hidrosfera y litosfera en Colombia',
+        arrows: [
+          { x1: 200, y1: 150, x2: 260, y2: 340, color: '#38bdf8', label: 'Entrada Atmosférica' },
+          { x1: 290, y1: 380, x2: 560, y2: 430, color: '#34d399', label: 'Transformación Biológica' },
+          { x1: 610, y1: 420, x2: 670, y2: 170, color: '#fbbf24', label: 'Retorno y Regulación' }
+        ]
+      };
+    }
+
+    /* =========================================================================
+       VISORES 3D INTERACTIVOS CON THREE.JS (BIOMAS ISOMÉTRICOS + MOLÉCULAS CPK)
+       ========================================================================= */
+    let sim3DHandle = null;
+    let mol3DHandle = null;
+
+    function destroy3DHandle(handle) {
+      if (!handle) return;
+      if (handle.rafId) cancelAnimationFrame(handle.rafId);
+      if (handle.renderer) {
+        handle.renderer.dispose();
+        if (handle.renderer.domElement && handle.renderer.domElement.parentNode) {
+          handle.renderer.domElement.parentNode.removeChild(handle.renderer.domElement);
+        }
+      }
+    }
+
+    function renderBiome3DScene(biomeId, stress) {
+      const container = document.getElementById('sim3DViewport');
+      if (!container || typeof THREE === 'undefined') return;
+      destroy3DHandle(sim3DHandle);
+      container.innerHTML = '';
+
+      try {
+        const w = container.clientWidth || 500;
+        const h = container.clientHeight || 208;
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(42, w / h, 0.1, 100);
+        camera.position.set(6.5, 5.2, 6.8);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(w, h);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        container.appendChild(renderer.domElement);
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.72));
+        const dirLight = new THREE.DirectionalLight(0xfff3c4, 0.95);
+        dirLight.position.set(6, 10, 5);
+        scene.add(dirLight);
+
+        const group = new THREE.Group();
+        const ratio = Math.min(1, Math.max(0, stress / 100));
+
+        // Bloque edáfico isométrico
+        const soilColor = ratio > 0.6 ? 0x7c4a2d : (biomeId === 'paramo' ? 0x2b2520 : 0x3f6212);
+        const baseGeo = new THREE.BoxGeometry(5.2, 1.0, 5.2);
+        const baseMat = new THREE.MeshStandardMaterial({ color: soilColor, roughness: 0.85 });
+        const baseMesh = new THREE.Mesh(baseGeo, baseMat);
+        baseMesh.position.y = -0.6;
+        group.add(baseMesh);
+
+        // Franja de río / humedad cuyo nivel responde al estrés
+        const waterGeo = new THREE.BoxGeometry(1.3, 0.28, 5.25);
+        const waterColor = ratio > 0.6 ? 0x78716c : 0x0ea5e9;
+        const waterMesh = new THREE.Mesh(waterGeo, new THREE.MeshStandardMaterial({ color: waterColor, transparent: true, opacity: 0.85 }));
+        waterMesh.position.set(1.5, -0.02 - ratio * 0.12, 0);
+        group.add(waterMesh);
+
+        // Vegetación 3D proporcional a la conservación
+        const treeCount = Math.max(2, Math.round(14 * (1 - ratio * 0.78)));
+        for (let i = 0; i < treeCount; i++) {
+          const tx = -2.1 + (i % 4) * 0.95;
+          const tz = -1.9 + Math.floor(i / 4) * 1.25;
+          const trunk = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.07, 0.1, 0.65, 8),
+            new THREE.MeshStandardMaterial({ color: 0x5c3a21 })
+          );
+          trunk.position.set(tx, 0.22, tz);
+          group.add(trunk);
+
+          const crownColor = ratio > 0.55 ? 0xd97706 : (biomeId === 'paramo' ? 0x84cc16 : 0x10b981);
+          const crownGeo = biomeId === 'paramo'
+            ? new THREE.DodecahedronGeometry(0.28)
+            : new THREE.ConeGeometry(0.36, 0.85, 9);
+          const crown = new THREE.Mesh(crownGeo, new THREE.MeshStandardMaterial({ color: crownColor, roughness: 0.6 }));
+          crown.position.set(tx, 0.72, tz);
+          group.add(crown);
+        }
+
+        scene.add(group);
+        attachInteractiveRotation(renderer.domElement, group);
+
+        const state = { renderer, rafId: null };
+        function animate() {
+          state.rafId = requestAnimationFrame(animate);
+          group.rotation.y += 0.0035;
+          renderer.render(scene, camera);
+        }
+        animate();
+        sim3DHandle = state;
+      } catch (e) {
+        container.innerHTML = '<div class="p-4 text-xs text-slate-400">Visor 3D optimizado en modo ligero.</div>';
+      }
+    }
+
+    function renderMolecule3D(formula) {
+      const container = document.getElementById('saberMolecule3D');
+      if (!container || typeof THREE === 'undefined') return;
+      destroy3DHandle(mol3DHandle);
+      container.innerHTML = '';
+
+      try {
+        const w = container.clientWidth || 460;
+        const h = container.clientHeight || 160;
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(40, w / h, 0.1, 100);
+        camera.position.set(0, 0.6, 5.2);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(w, h);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        container.appendChild(renderer.domElement);
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.78));
+        const pLight = new THREE.DirectionalLight(0xffffff, 0.9);
+        pLight.position.set(4, 6, 5);
+        scene.add(pLight);
+
+        const group = new THREE.Group();
+        const CPK = { C: 0x334155, O: 0xef4444, H: 0xf8fafc, N: 0x3b82f6, P: 0xf97316, S: 0xeab308 };
+
+        const specs = {
+          CO2: { center: ['C', 0.45], outer: [['O', -1.25, 0, 0, 0.42], ['O', 1.25, 0, 0, 0.42]] },
+          H2O: { center: ['O', 0.46], outer: [['H', -0.95, -0.55, 0, 0.3], ['H', 0.95, -0.55, 0, 0.3]] },
+          NH3: { center: ['N', 0.46], outer: [['H', -0.95, -0.5, 0.5, 0.28], ['H', 0.95, -0.5, 0.5, 0.28], ['H', 0, -0.5, -1.0, 0.28]] },
+          CH4: { center: ['C', 0.44], outer: [['H', 0, 1.05, 0, 0.28], ['H', -0.98, -0.45, 0.55, 0.28], ['H', 0.98, -0.45, 0.55, 0.28], ['H', 0, -0.45, -1.05, 0.28]] },
+          PO4: { center: ['P', 0.5], outer: [['O', 0, 1.18, 0, 0.38], ['O', -1.1, -0.48, 0.62, 0.38], ['O', 1.1, -0.48, 0.62, 0.38], ['O', 0, -0.48, -1.18, 0.38]] },
+          NO3: { center: ['N', 0.44], outer: [['O', 0, 1.15, 0, 0.38], ['O', -1.05, -0.6, 0, 0.38], ['O', 1.05, -0.6, 0, 0.38]] },
+          SO2: { center: ['S', 0.5], outer: [['O', -1.1, -0.45, 0, 0.4], ['O', 1.1, -0.45, 0, 0.4]] }
+        };
+
+        const mol = specs[formula] || specs.CO2;
+        const cAtom = new THREE.Mesh(
+          new THREE.SphereGeometry(mol.center[1], 24, 24),
+          new THREE.MeshStandardMaterial({ color: CPK[mol.center[0]], roughness: 0.3, metalness: 0.15 })
+        );
+        group.add(cAtom);
+
+        mol.outer.forEach(([el, x, y, z, r]) => {
+          const sphere = new THREE.Mesh(
+            new THREE.SphereGeometry(r, 22, 22),
+            new THREE.MeshStandardMaterial({ color: CPK[el], roughness: 0.3, metalness: 0.1 })
+          );
+          sphere.position.set(x, y, z);
+          group.add(sphere);
+
+          const vec = new THREE.Vector3(x, y, z);
+          const len = vec.length();
+          const bond = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.08, 0.08, len, 10),
+            new THREE.MeshStandardMaterial({ color: 0x94a3b8 })
+          );
+          bond.position.copy(vec.clone().multiplyScalar(0.5));
+          bond.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), vec.clone().normalize());
+          group.add(bond);
+        });
+
+        scene.add(group);
+        attachInteractiveRotation(renderer.domElement, group);
+
+        const state = { renderer, rafId: null };
+        function animate() {
+          state.rafId = requestAnimationFrame(animate);
+          group.rotation.y += 0.008;
+          group.rotation.x += 0.002;
+          renderer.render(scene, camera);
+        }
+        animate();
+        mol3DHandle = state;
+      } catch (e) {}
+    }
+
+    function attachInteractiveRotation(domEl, group) {
+      let dragging = false;
+      let px = 0, py = 0;
+      domEl.addEventListener('pointerdown', (e) => {
+        dragging = true;
+        px = e.clientX;
+        py = e.clientY;
+      });
+      window.addEventListener('pointerup', () => { dragging = false; });
+      domEl.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        const dx = e.clientX - px;
+        const dy = e.clientY - py;
+        px = e.clientX;
+        py = e.clientY;
+        group.rotation.y += dx * 0.012;
+        group.rotation.x += dy * 0.012;
+      });
+    }
+
+    /* =========================================================================
+       AUTOGUARDADO LOCAL Y SINCRONIZACIÓN REMOTA FIREBASE
+       ========================================================================= */
+    function saveProgress() {
+      try {
+        localStorage.setItem(EXAM_CONFIG.storageKey, JSON.stringify({
+          configTitle: EXAM_CONFIG.examTitle,
+          passingGrade: EXAM_CONFIG.passingGrade,
+          state: appState,
+          savedAt: new Date().toISOString()
+        }));
+        const ind = document.getElementById('autosaveIndicator');
+        if (ind) ind.textContent = '✓ Guardado ' + new Date().toLocaleTimeString('es-CO');
+      } catch (e) {}
+    }
+
+    function checkSavedProgress() {
+      try {
+        const raw = localStorage.getItem(EXAM_CONFIG.storageKey);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.state && parsed.state.started && !parsed.state.finished) {
+          const banner = document.getElementById('savedSessionBanner');
+          const info = document.getElementById('savedSessionInfo');
+          banner.classList.remove('hidden');
+          const mins = Math.floor((parsed.state.remainingSeconds || 0) / 60);
+          const secs = (parsed.state.remainingSeconds || 0) % 60;
+          info.textContent = 'Estudiante: ' + parsed.state.studentName + ' (' + parsed.state.studentGroup + ') • Tiempo restante: ' + mins + 'm ' + secs + 's.';
+          document.getElementById('resumeSavedBtn').onclick = () => {
+            appState = parsed.state;
+            if (parsed.configTitle) EXAM_CONFIG.examTitle = parsed.configTitle;
+            if (parsed.passingGrade) EXAM_CONFIG.passingGrade = Number(parsed.passingGrade);
+            enterExamWorkspace(true);
+          };
+        }
+      } catch (e) {}
+    }
+
+    function syncFirebaseStatus(statusTag, extraPayload) {
+      if (!appState.studentId) return;
+      const base = EXAM_CONFIG.firebaseUrl;
+      fetch(base + '/registeredExams/' + EXAM_CONFIG.examId + '.json', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          examTitle: EXAM_CONFIG.examTitle,
+          examId: EXAM_CONFIG.examId,
+          grade: EXAM_CONFIG.grade,
+          teacher: EXAM_CONFIG.teacherName,
+          updatedAt: new Date().toISOString()
+        })
+      }).catch(() => {});
+
+      const studentPayload = Object.assign({
+        studentName: appState.studentName,
+        group: appState.studentGroup,
+        status: statusTag,
+        currentSection: appState.currentSection,
+        remainingSeconds: appState.remainingSeconds,
+        penalties: appState.totalPenaltyPoints,
+        updatedAt: new Date().toISOString()
+      }, extraPayload || {});
+
+      fetch(base + '/exams/' + EXAM_CONFIG.examId + '/students/' + appState.studentId + '.json', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(studentPayload)
+      }).catch(() => {});
+    }
+
+    /* =========================================================================
+       SISTEMA DE SEGURIDAD ANTIFRAUDE Y PENALIZACIONES
+       ========================================================================= */
+    function registerPenalty(reason, deduction) {
+      if (!appState.started || appState.finished) return;
+      const timeStr = new Date().toLocaleTimeString('es-CO');
+      appState.penalties.push({ reason, deduction, time: timeStr });
+      appState.totalPenaltyPoints = Number((appState.totalPenaltyPoints + deduction).toFixed(2));
+      updatePenaltyDisplay();
+      saveProgress();
+      syncFirebaseStatus('penalizado');
+      showToast('Penalización aplicada (-' + deduction.toFixed(2) + ' pts): ' + reason);
+    }
+
+    function updatePenaltyDisplay() {
+      document.getElementById('headerPenaltyDisplay').textContent = '-' + appState.totalPenaltyPoints.toFixed(2);
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toastBanner');
+      t.textContent = msg;
+      t.classList.remove('hidden');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.add('hidden'), 5000);
+    }
+
+    function initAntiCheatGuards() {
+      ['pointerdown', 'pointermove', 'keydown', 'touchstart'].forEach((ev) => {
+        window.addEventListener(ev, () => { lastUserActivity = Date.now(); }, { passive: true });
+      });
+
+      // Bloqueo total de copiar, cortar, pegar texto o imágenes y arrastrar imágenes
+      ['copy', 'cut', 'paste', 'dragstart', 'drop', 'contextmenu'].forEach((evName) => {
+        document.addEventListener(evName, (e) => {
+          e.preventDefault();
+          if (appState.started && !appState.finished && (evName === 'copy' || evName === 'paste' || evName === 'drop')) {
+            if (!appState.copyWarnedOnce) {
+              appState.copyWarnedOnce = true;
+              showToast('Advertencia: Está deshabilitado copiar y pegar texto o imágenes en esta evaluación.');
+              saveProgress();
+            } else {
+              registerPenalty('Intento reiterado de copiar/pegar contenido o imágenes', 0.20);
+            }
+          }
+        });
+      });
+
+      // Bloqueo de atajos de teclado (Ctrl+C/V/X/P/S/U, F12, PrintScreen)
+      document.addEventListener('keydown', (e) => {
+        const key = (e.key || '').toLowerCase();
+        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['i', 'j', 'c'].includes(key))) {
+          e.preventDefault();
+          showToast('Herramientas de inspección bloqueadas durante la prueba.');
+          return;
+        }
+        if ((e.ctrlKey || e.metaKey) && ['c', 'v', 'x', 'p', 's', 'u'].includes(key)) {
+          e.preventDefault();
+          showToast('Acción de portapapeles o captura deshabilitada.');
+        }
+        if (e.key === 'PrintScreen') {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText('').catch(() => {});
+          }
+          registerPenalty('Intento de captura de pantalla detectado', 0.20);
+        }
+      });
+
+      // Prohibido salir de la pestaña
+      document.addEventListener('visibilitychange', () => {
+        if (!appState.started || appState.finished) return;
+        if (document.hidden) {
+          const inactiveMs = Date.now() - lastUserActivity;
+          if (inactiveMs < 7500) {
+            registerPenalty('Salida no autorizada de la pestaña de evaluación', 0.30);
+            openSecurityLockModal('Se registró una salida de la pestaña activa (-0.30 puntos). No está permitido abandonar la evaluación.');
+          }
+        }
+      });
+
+      window.addEventListener('blur', () => {
+        if (!appState.started || appState.finished) return;
+        setTimeout(() => {
+          if (!document.hasFocus() && !document.hidden) {
+            registerPenalty('Cambio de ventana o aplicación externa', 0.30);
+            openSecurityLockModal('Cambiaste a otra ventana fuera de la prueba (-0.30 puntos).');
+          }
+        }, 250);
+      });
+
+      // Pantalla completa obligatoria
+      document.addEventListener('fullscreenchange', () => {
+        if (!appState.started || appState.finished) return;
+        if (!document.fullscreenElement) {
+          appState.fsExitCount += 1;
+          if (appState.fsExitCount > 1) {
+            registerPenalty('Abandono reiterado del modo pantalla completa', 0.20);
+          }
+          openSecurityLockModal('Saliste del modo de pantalla completa obligatorio. Restáuralo para continuar.');
+          saveProgress();
+        }
+      });
+
+      // Advertencia de salida de la prueba y persistencia
+      window.addEventListener('beforeunload', (e) => {
+        if (appState.started && !appState.finished) {
+          saveProgress();
+          e.preventDefault();
+          e.returnValue = '';
+        }
+      });
+    }
+
+    function openSecurityLockModal(reasonText) {
+      document.getElementById('securityModalReason').textContent = reasonText;
+      document.getElementById('fullscreenModal').classList.remove('hidden');
+    }
+
+    function requestSafeFullscreen() {
+      const el = document.documentElement;
+      if (el.requestFullscreen) {
+        el.requestFullscreen().catch(() => {});
+      }
+    }
+
+    // Sonómetro continuo al 60%
+    async function initNoiseMonitor() {
+      if (audioContextRef || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        audioContextRef = new AudioCtx();
+        const source = audioContextRef.createMediaStreamSource(stream);
+        const analyser = audioContextRef.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        const data = new Uint8Array(analyser.frequencyBinCount);
+        document.getElementById('noiseBadge').classList.remove('hidden');
+        document.getElementById('noiseBadge').classList.add('flex');
+
+        function sampleAudio() {
+          if (appState.finished) return;
+          analyser.getByteFrequencyData(data);
+          let sum = 0;
+          for (let i = 0; i < data.length; i++) sum += data[i];
+          const avg = sum / data.length;
+          const pct = Math.min(100, Math.round((avg / 135) * 100));
+          document.getElementById('noiseBar').style.width = pct + '%';
+          document.getElementById('noisePct').textContent = pct + '%';
+          document.getElementById('noiseBar').className = 'h-full transition-all duration-150 ' + (pct >= 60 ? 'bg-rose-500' : 'bg-emerald-400');
+
+          if (EXAM_CONFIG.noiseEnabled && appState.started && pct >= 60 && Date.now() - lastNoisePenaltyTime > 14000) {
+            lastNoisePenaltyTime = Date.now();
+            registerPenalty('Nivel de ruido ambiental superior al 60%', 0.20);
+          }
+          requestAnimationFrame(sampleAudio);
+        }
+        sampleAudio();
+      } catch (e) {}
+    }
+
+    /* =========================================================================
+       RENDERIZADO DE LAS 3 SECCIONES E INTERACCIÓN
+       ========================================================================= */
+    function countSubstantiveWords(text) {
+      const words = String(text || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+        .split(/\s+/)
+        .filter((w) => w.length >= 3);
+      const unique = new Set(words);
+      return { total: words.length, unique: unique.size, words };
+    }
+
+    function switchSection(secNum) {
+      appState.currentSection = secNum;
+      [1, 2, 3].forEach((n) => {
+        const el = document.getElementById('section' + n + 'Container');
+        el.classList.toggle('hidden', n !== secNum);
+      });
+
+      document.querySelectorAll('.sec-nav-btn').forEach((btn) => {
+        const bSec = Number(btn.getAttribute('data-sec'));
+        if (bSec === secNum) {
+          btn.className = 'sec-nav-btn rounded-xl py-2.5 px-3 text-xs sm:text-sm font-bold border transition text-left bg-amber-400/20 border-amber-400 text-amber-200';
+        } else {
+          btn.className = 'sec-nav-btn rounded-xl py-2.5 px-3 text-xs sm:text-sm font-bold border transition text-left bg-slate-900/60 border-slate-700 text-slate-300 hover:border-slate-500';
+        }
+      });
+
+      document.getElementById('sectionBudgetBadge').textContent = EXAM_CONFIG.sectionBudgets[secNum];
+      if (secNum === 1) renderCurrentSimulation();
+      if (secNum === 2) renderCurrentSaberQuestion();
+      if (secNum === 3) renderCurrentRoleCase();
+      updateOverallProgress();
+      saveProgress();
+    }
+
+    // --- Render Sección 1: Simulaciones ---
+    function renderCurrentSimulation() {
+      const sim = BIOME_SIMULATIONS[appState.currentSimIndex];
+      const stateEntry = appState.simData[sim.id];
+
+      // Pestañas selectoras de bioma
+      const tabsEl = document.getElementById('simSelectorTabs');
+      tabsEl.innerHTML = '';
+      BIOME_SIMULATIONS.forEach((b, idx) => {
+        const st = appState.simData[b.id];
+        const done = st.changes >= 3 && countSubstantiveWords(st.justification).total >= 25;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold border transition ' +
+          (idx === appState.currentSimIndex
+            ? 'bg-cyan-500/25 border-cyan-400 text-cyan-200'
+            : done
+              ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-200'
+              : 'bg-slate-900 border-slate-700 text-slate-300');
+        btn.textContent = b.shortTab + (done ? ' ✓' : '');
+        btn.onclick = () => {
+          appState.currentSimIndex = idx;
+          renderCurrentSimulation();
+          saveProgress();
+        };
+        tabsEl.appendChild(btn);
+      });
+
+      document.getElementById('simBiomeTitle').textContent = sim.name;
+      document.getElementById('simContextDesc').textContent = sim.description;
+
+      const slidersWrap = document.getElementById('simSlidersContainer');
+      slidersWrap.innerHTML = '';
+      sim.sliders.forEach((sl) => {
+        const val = stateEntry.vars[sl.key];
+        const row = document.createElement('div');
+        row.className = 'space-y-1';
+        row.innerHTML = `
+          <div class="flex justify-between text-xs">
+            <span class="font-semibold text-slate-200">${sl.label}</span>
+            <span id="lbl_${sim.id}_${sl.key}" class="font-mono font-bold text-amber-300">${val}${sl.unit}</span>
+          </div>
+          <input type="range" min="${sl.min}" max="${sl.max}" step="${sl.step}" value="${val}" class="w-full" />
+        `;
+        const input = row.querySelector('input');
+        input.addEventListener('input', (e) => {
+          stateEntry.vars[sl.key] = Number(e.target.value);
+          document.getElementById(`lbl_${sim.id}_${sl.key}`).textContent = stateEntry.vars[sl.key] + sl.unit;
+          refreshSimulationConsequences(sim, stateEntry, false);
+        });
+        input.addEventListener('change', () => {
+          stateEntry.changes += 1;
+          refreshSimulationConsequences(sim, stateEntry, true);
+          updateOverallProgress();
+          saveProgress();
+        });
+        slidersWrap.appendChild(row);
+      });
+
+      const justInput = document.getElementById('simJustificationInput');
+      justInput.value = stateEntry.justification || '';
+      justInput.oninput = (e) => {
+        stateEntry.justification = e.target.value;
+        validateSimJustificationUI(stateEntry);
+        updateOverallProgress();
+        saveProgress();
+      };
+
+      document.getElementById('resetSimVarsBtn').onclick = () => {
+        sim.sliders.forEach((sl) => { stateEntry.vars[sl.key] = sl.defaultVal; });
+        stateEntry.changes += 1;
+        renderCurrentSimulation();
+        saveProgress();
+      };
+
+      document.getElementById('prevSimBtn').disabled = appState.currentSimIndex === 0;
+      document.getElementById('prevSimBtn').classList.toggle('opacity-40', appState.currentSimIndex === 0);
+      document.getElementById('nextSimOrSectionBtn').textContent =
+        appState.currentSimIndex < BIOME_SIMULATIONS.length - 1 ? 'Siguiente Bioma →' : 'Ir a Sección 2: Prueba Saber →';
+
+      refreshSimulationConsequences(sim, stateEntry, true);
+      validateSimJustificationUI(stateEntry);
+    }
+
+    function refreshSimulationConsequences(sim, stateEntry, update3D) {
+      const res = sim.compute(stateEntry.vars);
+      const badge = document.getElementById('simUicnBadge');
+      badge.className = 'px-2.5 py-0.5 rounded-full font-extrabold text-[11px] ' + res.badgeClass;
+      badge.textContent = res.uicn;
+
+      const grid = document.getElementById('simMetricsGrid');
+      grid.innerHTML = '';
+      res.metrics.forEach((m) => {
+        const box = document.createElement('div');
+        box.className = 'rounded-xl p-3 border ' + (m.good ? 'bg-slate-900/80 border-emerald-500/30' : 'bg-rose-950/40 border-rose-500/40');
+        box.innerHTML = `
+          <div class="text-[11px] text-slate-400 font-semibold">${m.label}</div>
+          <div class="text-base font-extrabold mt-0.5 ${m.good ? 'text-emerald-300' : 'text-rose-300'}">${m.value}</div>
+        `;
+        grid.appendChild(box);
+      });
+
+      const alertEl = document.getElementById('simConsequenceAlert');
+      alertEl.className = 'p-3 rounded-xl text-xs leading-relaxed border ' + res.alertClass;
+      alertEl.textContent = res.narrative;
+
+      document.getElementById('simInteractionsCount').textContent =
+        stateEntry.changes + ' ajustes ' + (stateEntry.changes >= 3 ? '✓' : '(mínimo 3 requeridos)');
+
+      document.getElementById('simDynamicPlateImg').src = generateScientificPlatePNG(sim.id, res);
+      if (update3D) renderBiome3DScene(sim.id, res.stress);
+    }
+
+    function validateSimJustificationUI(stateEntry) {
+      const wc = countSubstantiveWords(stateEntry.justification);
+      const msgEl = document.getElementById('simWordValidationMsg');
+      const badgeEl = document.getElementById('simCompletionBadge');
+      msgEl.textContent = wc.total + ' / 25 palabras sustantivas (' + wc.unique + ' únicas)';
+      const ok = wc.total >= 25 && wc.unique >= 12 && stateEntry.changes >= 3;
+      msgEl.className = ok ? 'text-emerald-300 font-semibold' : 'text-amber-300 font-semibold';
+      badgeEl.textContent = ok ? '✓ Simulación sustentada' : (stateEntry.changes < 3 ? 'Modifica al menos 3 veces el bioma' : 'Completa la sustentación');
+      badgeEl.className = ok ? 'font-bold text-emerald-300' : 'font-bold text-amber-300';
+    }
+
+    // --- Render Sección 2: 15 Preguntas Prueba Saber ---
+    function renderCurrentSaberQuestion() {
+      const idx = appState.currentSaberIndex;
+      const q = SABER_QUESTIONS[idx];
+
+      // Píldoras de navegación rápida
+      const pills = document.getElementById('saberPillsGrid');
+      pills.innerHTML = '';
+      SABER_QUESTIONS.forEach((item, i) => {
+        const answered = appState.saberAnswers[i] !== null;
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = i + 1;
+        b.className = 'w-8 h-8 rounded-lg text-xs font-extrabold border transition ' +
+          (i === idx
+            ? 'bg-amber-400 text-slate-950 border-amber-300'
+            : answered
+              ? 'bg-emerald-500/25 border-emerald-400/50 text-emerald-200'
+              : 'bg-slate-900 border-slate-700 text-slate-400');
+        b.onclick = () => {
+          appState.currentSaberIndex = i;
+          renderCurrentSaberQuestion();
+          saveProgress();
+        };
+        pills.appendChild(b);
+      });
+
+      document.getElementById('saberCompetencyBadge').textContent = q.competency;
+      document.getElementById('saberQuestionHeader').textContent = 'Pregunta ' + (idx + 1) + ' de 15';
+      document.getElementById('saberContextText').textContent = q.context;
+      document.getElementById('saberStemText').textContent = q.stem;
+      document.getElementById('saberPlateImg').src = generateScientificPlatePNG(q.plateTheme);
+      document.getElementById('saberMoleculeLabel').textContent = q.moleculeLabel;
+      renderMolecule3D(q.molecule);
+
+      // Opciones sin prefijos ni parámetros internos
+      const optsWrap = document.getElementById('saberOptionsContainer');
+      optsWrap.innerHTML = '';
+      q.options.forEach((optText, optIdx) => {
+        const isSelected = appState.saberAnswers[idx] === optIdx;
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'option-card w-full text-left rounded-2xl p-4 flex items-start gap-3 ' + (isSelected ? 'selected' : '');
+        card.innerHTML = `
+          <span class="mt-0.5 w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center ${isSelected ? 'border-emerald-400 bg-emerald-400' : 'border-slate-400'}">
+            ${isSelected ? '<span class="w-2 h-2 rounded-full bg-slate-950"></span>' : ''}
+          </span>
+          <span class="text-xs sm:text-sm text-slate-100 leading-relaxed">${optText}</span>
+        `;
+        card.onclick = () => {
+          appState.saberAnswers[idx] = optIdx;
+          renderCurrentSaberQuestion();
+          updateOverallProgress();
+          saveProgress();
+        };
+        optsWrap.appendChild(card);
+      });
+
+      // Temporizador corto de lectura comprensiva (15 seg la primera vez que visita el ítem)
+      clearInterval(saberReadTimer);
+      const readBadge = document.getElementById('saberMinReadBadge');
+      const nextBtn = document.getElementById('nextSaberBtn');
+      nextBtn.textContent = idx < SABER_QUESTIONS.length - 1 ? 'Siguiente Pregunta →' : 'Ir a Sección 3: Roles Ambientales →';
+
+      if (!appState.saberReadUnlocked[idx]) {
+        saberSecondsLeft = 15;
+        readBadge.textContent = 'Lectura mínima: ' + saberSecondsLeft + 's';
+        nextBtn.disabled = true;
+        nextBtn.classList.add('opacity-45');
+        saberReadTimer = setInterval(() => {
+          saberSecondsLeft -= 1;
+          if (saberSecondsLeft <= 0) {
+            clearInterval(saberReadTimer);
+            appState.saberReadUnlocked[idx] = true;
+            readBadge.textContent = '✓ Lectura habilitada';
+            nextBtn.disabled = false;
+            nextBtn.classList.remove('opacity-45');
+            saveProgress();
+          } else {
+            readBadge.textContent = 'Lectura mínima: ' + saberSecondsLeft + 's';
+          }
+        }, 1000);
+      } else {
+        readBadge.textContent = '✓ Lectura verificada';
+        nextBtn.disabled = false;
+        nextBtn.classList.remove('opacity-45');
+      }
+
+      document.getElementById('prevSaberBtn').disabled = idx === 0;
+      document.getElementById('prevSaberBtn').classList.toggle('opacity-40', idx === 0);
+    }
+
+    // --- Render Sección 3: 5 Roles Abiertos ---
+    function renderCurrentRoleCase() {
+      const idx = appState.currentRoleIndex;
+      const rc = ROLE_CASES[idx];
+
+      const pills = document.getElementById('roleSelectorPills');
+      pills.innerHTML = '';
+      ROLE_CASES.forEach((item, i) => {
+        const done = countSubstantiveWords(appState.roleAnswers[i]).total >= 28;
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = 'Rol ' + (i + 1) + (done ? ' ✓' : '');
+        b.className = 'px-3 py-1.5 rounded-xl text-xs font-bold border transition ' +
+          (i === idx
+            ? 'bg-emerald-400 text-slate-950 border-emerald-300'
+            : done
+              ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-200'
+              : 'bg-slate-900 border-slate-700 text-slate-300');
+        b.onclick = () => {
+          appState.currentRoleIndex = i;
+          renderCurrentRoleCase();
+          saveProgress();
+        };
+        pills.appendChild(b);
+      });
+
+      document.getElementById('roleBadgeLabel').textContent = rc.roleTitle;
+      document.getElementById('roleCycleTag').textContent = rc.cycleTag;
+      document.getElementById('roleCaseTitle').textContent = rc.caseTitle;
+      document.getElementById('roleScenarioText').textContent = rc.scenario;
+      document.getElementById('rolePromptQuestion').textContent = rc.prompt;
+      document.getElementById('roleCasePlateImg').src = generateScientificPlatePNG(rc.plateTheme);
+
+      const area = document.getElementById('roleAnswerInput');
+      area.value = appState.roleAnswers[idx] || '';
+      area.oninput = (e) => {
+        appState.roleAnswers[idx] = e.target.value;
+        validateRoleAnswerUI(idx);
+        updateOverallProgress();
+        saveProgress();
+      };
+
+      document.getElementById('prevRoleBtn').disabled = idx === 0;
+      document.getElementById('prevRoleBtn').classList.toggle('opacity-40', idx === 0);
+      document.getElementById('nextRoleBtn').disabled = idx === ROLE_CASES.length - 1;
+      document.getElementById('nextRoleBtn').classList.toggle('opacity-40', idx === ROLE_CASES.length - 1);
+
+      validateRoleAnswerUI(idx);
+    }
+
+    function validateRoleAnswerUI(idx) {
+      const wc = countSubstantiveWords(appState.roleAnswers[idx]);
+      const msg = document.getElementById('roleWordCountMsg');
+      const tag = document.getElementById('roleStatusTag');
+      msg.textContent = wc.total + ' / 28 palabras sustantivas (' + wc.unique + ' únicas)';
+      const ok = wc.total >= 28 && wc.unique >= 14;
+      msg.className = ok ? 'text-emerald-300 font-semibold' : 'text-amber-300 font-semibold';
+      tag.textContent = ok ? '✓ Caso resuelto' : 'Amplía tu análisis científico';
+      tag.className = ok ? 'font-bold text-emerald-300' : 'font-bold text-amber-300';
+    }
+
+    function updateOverallProgress() {
+      let completedItems = 0;
+      const totalItems = 3 + 15 + 5; // 23 unidades evaluativas
+      BIOME_SIMULATIONS.forEach((b) => {
+        const st = appState.simData[b.id];
+        if (st.changes >= 3 && countSubstantiveWords(st.justification).total >= 25) completedItems += 1;
+      });
+      appState.saberAnswers.forEach((a) => { if (a !== null) completedItems += 1; });
+      appState.roleAnswers.forEach((txt) => { if (countSubstantiveWords(txt).total >= 28) completedItems += 1; });
+
+      const pct = Math.max(4, Math.round((completedItems / totalItems) * 100));
+      document.getElementById('overallProgressBar').style.width = pct + '%';
+    }
+
+    /* =========================================================================
+       CALIFICACIÓN EXACTA (1.0 A 5.0, APROBATORIA 3.7) Y GENERACIÓN DE .PDF
+       ========================================================================= */
+    function evaluateWrittenResponse(text, keywords, minWords) {
+      const wc = countSubstantiveWords(text);
+      if (wc.total === 0) return 0;
+      const lengthScore = Math.min(1, wc.total / minWords) * 0.55;
+      const diversityScore = Math.min(1, wc.unique / Math.max(10, Math.round(minWords * 0.5))) * 0.20;
+      const lower = String(text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      let hits = 0;
+      keywords.forEach((kw) => { if (lower.includes(kw)) hits += 1; });
+      const conceptScore = Math.min(1, hits / 3) * 0.25;
+      return Math.min(1, lengthScore + diversityScore + conceptScore);
+    }
+
+    function computeFinalEvaluation() {
+      // Sección 1 (25% del rango variable de 4.00 pts = 1.00 pto)
+      let sec1Sum = 0;
+      const simDetails = BIOME_SIMULATIONS.map((b) => {
+        const st = appState.simData[b.id];
+        const expRatio = Math.min(1, st.changes / 3) * 0.30;
+        const justRatio = evaluateWrittenResponse(st.justification, b.keywords, 25) * 0.70;
+        const itemRatio = expRatio + justRatio;
+        sec1Sum += itemRatio;
+        return { name: b.name, changes: st.changes, ratio: itemRatio, justification: st.justification || '(Sin respuesta)' };
+      });
+      const sec1Ratio = sec1Sum / BIOME_SIMULATIONS.length;
+
+      // Sección 2 (45% del rango variable de 4.00 pts = 1.80 pts)
+      let saberHits = 0;
+      const saberDetails = SABER_QUESTIONS.map((q, idx) => {
+        const ans = appState.saberAnswers[idx];
+        const ok = ans === q.correct;
+        if (ok) saberHits += 1;
+        return {
+          num: idx + 1,
+          stem: q.stem,
+          selectedText: ans !== null ? q.options[ans] : '(No respondida)',
+          correctText: q.options[q.correct],
+          ok
+        };
+      });
+      const sec2Ratio = saberHits / SABER_QUESTIONS.length;
+
+      // Sección 3 (30% del rango variable de 4.00 pts = 1.20 pts)
+      let sec3Sum = 0;
+      const roleDetails = ROLE_CASES.map((rc, idx) => {
+        const txt = appState.roleAnswers[idx];
+        const r = evaluateWrittenResponse(txt, rc.keywords, 28);
+        sec3Sum += r;
+        return { roleTitle: rc.roleTitle, caseTitle: rc.caseTitle, ratio: r, answer: txt || '(Sin respuesta)' };
+      });
+      const sec3Ratio = sec3Sum / ROLE_CASES.length;
+
+      const weightedAchievement = sec1Ratio * 0.25 + sec2Ratio * 0.45 + sec3Ratio * 0.30;
+      const rawGrade = EXAM_CONFIG.minGrade + weightedAchievement * (EXAM_CONFIG.maxGrade - EXAM_CONFIG.minGrade);
+      const finalGrade = Math.max(EXAM_CONFIG.minGrade, Math.min(EXAM_CONFIG.maxGrade, Number((rawGrade - appState.totalPenaltyPoints).toFixed(2))));
+      const approved = finalGrade >= EXAM_CONFIG.passingGrade;
+
+      return {
+        sec1Ratio,
+        sec2Ratio,
+        saberHits,
+        sec3Ratio,
+        rawGrade: Number(rawGrade.toFixed(2)),
+        finalGrade,
+        approved,
+        simDetails,
+        saberDetails,
+        roleDetails
+      };
+    }
+
+    function finalizeExamAndGeneratePDF(reasonLabel) {
+      if (appState.finished) return;
+      appState.finished = true;
+      appState.endTimeISO = new Date().toISOString();
+      clearInterval(globalInterval);
+      clearInterval(saberReadTimer);
+      destroy3DHandle(sim3DHandle);
+      destroy3DHandle(mol3DHandle);
+
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+
+      const report = computeFinalEvaluation();
+      saveProgress();
+
+      // Envío a Firebase
+      syncFirebaseStatus('finalizado', { finalGrade: report.finalGrade, approved: report.approved });
+      fetch(EXAM_CONFIG.firebaseUrl + '/exams/' + EXAM_CONFIG.examId + '/submissions/' + appState.studentId + '.json', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          examTitle: EXAM_CONFIG.examTitle,
+          studentName: appState.studentName,
+          group: appState.studentGroup,
+          startTime: appState.startTimeISO,
+          endTime: appState.endTimeISO,
+          closeReason: reasonLabel || 'Entrega estudiante',
+          rawGrade: report.rawGrade,
+          penalties: appState.totalPenaltyPoints,
+          finalGrade: report.finalGrade,
+          approved: report.approved,
+          saberHits: report.saberHits
+        })
+      }).catch(() => {});
+
+      // Render Pantalla Final
+      document.getElementById('examWorkspace').classList.add('hidden');
+      document.getElementById('globalTimerWrap').classList.add('hidden');
+      document.getElementById('fullscreenModal').classList.add('hidden');
+      document.getElementById('confirmSubmitModal').classList.add('hidden');
+      document.getElementById('resultsScreen').classList.remove('hidden');
+
+      const badge = document.getElementById('finalApprovalBadge');
+      badge.textContent = report.approved ? 'APROBADO (≥ ' + EXAM_CONFIG.passingGrade.toFixed(2) + ')' : 'NO APROBADO (< ' + EXAM_CONFIG.passingGrade.toFixed(2) + ')';
+      badge.className = 'inline-block px-3.5 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider ' +
+        (report.approved ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-400/50' : 'bg-rose-500/25 text-rose-300 border border-rose-400/50');
+
+      document.getElementById('finalGradeNumber').textContent = report.finalGrade.toFixed(2);
+      document.getElementById('finalStudentMeta').textContent =
+        appState.studentName + ' • ' + appState.studentGroup + ' • Nota base: ' + report.rawGrade.toFixed(2) + ' | Penalización: -' + appState.totalPenaltyPoints.toFixed(2);
+      document.getElementById('resSec1Score').textContent = Math.round(report.sec1Ratio * 100) + '%';
+      document.getElementById('resSec2Score').textContent = report.saberHits + ' / 15';
+      document.getElementById('resSec3Score').textContent = Math.round(report.sec3Ratio * 100) + '%';
+      document.getElementById('resPenaltyTotal').textContent = '-' + appState.totalPenaltyPoints.toFixed(2);
+
+      // Generar QR institucional
+      const qrCanvas = document.getElementById('resultQrCanvas');
+      if (typeof QRious !== 'undefined') {
+        new QRious({
+          element: qrCanvas,
+          size: 108,
+          value: JSON.stringify({
+            inst: 'GC Faro de Luz',
+            exam: EXAM_CONFIG.examTitle,
+            est: appState.studentName,
+            grp: appState.studentGroup,
+            nota: report.finalGrade.toFixed(2),
+            apr: report.approved ? 'SI' : 'NO',
+            sab: report.saberHits + '/15',
+            pen: appState.totalPenaltyPoints.toFixed(2)
+          })
+        });
+      }
+
+      // Descarga automática del informe PDF
+      generateStudentPDF(report, qrCanvas);
+      document.getElementById('downloadPdfAgainBtn').onclick = () => generateStudentPDF(report, qrCanvas);
+    }
+
+    function generateStudentPDF(report, qrCanvas) {
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        showToast('Librería PDF no disponible en este navegador.');
+        return;
+      }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const pageW = 210;
+      const margin = 14;
+      let y = 12;
+
+      function ensureSpace(needed) {
+        if (y + needed > 282) {
+          doc.addPage();
+          y = 15;
+        }
+      }
+
+      // Banner institucional superior
+      const bannerData = generateOfficialBannerDataURL();
+      doc.addImage(bannerData, 'PNG', margin, y, pageW - margin * 2, 36);
+      y += 42;
+
+      // Ficha Técnica del Estudiante
+      doc.setFillColor(8, 27, 56);
+      doc.roundedRect(margin, y, pageW - margin * 2, 34, 3, 3, 'F');
+      doc.setTextColor(223, 178, 53);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('INFORME INDIVIDUAL DE EVALUACIÓN • GRADO DÉCIMO', margin + 5, y + 7);
+
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(9.5);
+      doc.text('Estudiante: ' + appState.studentName + ' (' + appState.studentGroup + ')', margin + 5, y + 14);
+      doc.text('Docente: ' + EXAM_CONFIG.teacherName + ' | Actividad: ' + EXAM_CONFIG.examTitle, margin + 5, y + 20);
+      doc.text('Fecha: ' + new Date().toLocaleString('es-CO') + ' | Penalizaciones: -' + appState.totalPenaltyPoints.toFixed(2), margin + 5, y + 26);
+
+      const estadoTxt = report.approved ? 'APROBADO' : 'NO APROBADO';
+      doc.setTextColor(report.approved ? 52 : 248, report.approved ? 211 : 113, report.approved ? 153 : 113);
+      doc.setFontSize(13);
+      doc.text('NOTA FINAL: ' + report.finalGrade.toFixed(2) + ' / 5.00 (' + estadoTxt + ')', margin + 5, y + 32);
+
+      if (qrCanvas && qrCanvas.toDataURL) {
+        doc.addImage(qrCanvas.toDataURL('image/png'), 'PNG', pageW - margin - 29, y + 3, 26, 26);
+      }
+      y += 41;
+
+      // Registro de Penalizaciones
+      ensureSpace(22);
+      doc.setTextColor(8, 27, 56);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('1. BITÁCORA DE SUPERVISIÓN Y PENALIZACIONES ANTIFRAUDE', margin, y);
+      y += 5;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      if (appState.penalties.length === 0) {
+        doc.setTextColor(5, 150, 105);
+        doc.text('Sin infracciones registradas durante la presentación de la prueba (-0.00 puntos).', margin, y);
+        y += 7;
+      } else {
+        doc.setTextColor(185, 28, 28);
+        appState.penalties.forEach((p, idx) => {
+          ensureSpace(6);
+          doc.text((idx + 1) + '. [' + p.time + '] ' + p.reason + ' (-' + p.deduction.toFixed(2) + ' pts)', margin, y);
+          y += 5;
+        });
+        y += 3;
+      }
+
+      // Sección 1: Simulaciones
+      ensureSpace(20);
+      doc.setTextColor(8, 27, 56);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('2. SECCIÓN 1: SIMULACIONES DE BIOMAS Y SUSTENTACIONES (' + Math.round(report.sec1Ratio * 100) + '%)', margin, y);
+      y += 6;
+
+      report.simDetails.forEach((sd) => {
+        const lines = doc.splitTextToSize('Sustentación del estudiante: ' + sd.justification, pageW - margin * 2 - 4);
+        ensureSpace(12 + lines.length * 4.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9.5);
+        doc.setTextColor(15, 43, 84);
+        doc.text('• ' + sd.name + ' (Ajustes realizados: ' + sd.changes + ' | Desempeño: ' + Math.round(sd.ratio * 100) + '%)', margin, y);
+        y += 4.5;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.8);
+        doc.setTextColor(51, 65, 85);
+        doc.text(lines, margin + 2, y);
+        y += lines.length * 4.2 + 3;
+      });
+
+      // Sección 2: 15 Preguntas Prueba Saber
+      ensureSpace(20);
+      doc.setTextColor(8, 27, 56);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('3. SECCIÓN 2: PREGUNTAS TIPO PRUEBA SABER (' + report.saberHits + ' / 15 ACIERTOS)', margin, y);
+      y += 6;
+
+      report.saberDetails.forEach((qd) => {
+        const stemLines = doc.splitTextToSize('Ítem ' + qd.num + ': ' + qd.stem, pageW - margin * 2);
+        const selLines = doc.splitTextToSize('Marcada: ' + qd.selectedText, pageW - margin * 2 - 4);
+        const corLines = doc.splitTextToSize('Clave correcta: ' + qd.correctText, pageW - margin * 2 - 4);
+        ensureSpace((stemLines.length + selLines.length + corLines.length) * 4.2 + 6);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.setTextColor(15, 23, 42);
+        doc.text(stemLines, margin, y);
+        y += stemLines.length * 4.1;
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.5);
+        doc.setTextColor(qd.ok ? 5 : 185, qd.ok ? 150 : 28, qd.ok ? 105 : 28);
+        doc.text(selLines, margin + 3, y);
+        y += selLines.length * 4;
+
+        if (!qd.ok) {
+          doc.setTextColor(5, 150, 105);
+          doc.text(corLines, margin + 3, y);
+          y += corLines.length * 4;
+        }
+        y += 2.5;
+      });
+
+      // Sección 3: 5 Casos de Rol
+      ensureSpace(20);
+      doc.setTextColor(8, 27, 56);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('4. SECCIÓN 3: ROLES Y ANÁLISIS DE CONTAMINACIÓN (' + Math.round(report.sec3Ratio * 100) + '%)', margin, y);
+      y += 6;
+
+      report.roleDetails.forEach((rd) => {
+        const ansLines = doc.splitTextToSize('Respuesta redactada: ' + rd.answer, pageW - margin * 2 - 4);
+        ensureSpace(12 + ansLines.length * 4.3);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9.5);
+        doc.setTextColor(15, 43, 84);
+        doc.text('• ' + rd.roleTitle + ' — ' + rd.caseTitle + ' (' + Math.round(rd.ratio * 100) + '%)', margin, y);
+        y += 4.5;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.8);
+        doc.setTextColor(51, 65, 85);
+        doc.text(ansLines, margin + 2, y);
+        y += ansLines.length * 4.2 + 3.5;
+      });
+
+      const safeName = appState.studentName.replace(/[^a-zA-Z0-9]/g, '_');
+      doc.save('INFORME_BIOMAS_G10_' + safeName + '.pdf');
+    }
+
+    /* =========================================================================
+       FLUJO DE INICIO, TEMPORIZADOR DE 45 MINUTOS Y PANEL DOCENTE
+       ========================================================================= */
+    function formatMMSS(sec) {
+      const s = Math.max(0, Math.floor(sec));
+      const m = String(Math.floor(s / 60)).padStart(2, '0');
+      const r = String(s % 60).padStart(2, '0');
+      return m + ':' + r;
+    }
+
+    function enterExamWorkspace(isResuming) {
+      if (!isResuming) {
+        appState.started = true;
+        appState.startTimeISO = new Date().toISOString();
+        appState.studentId = appState.studentName.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_' + Date.now().toString().slice(-4);
+      }
+
+      document.getElementById('welcomeScreen').classList.add('hidden');
+      document.getElementById('examWorkspace').classList.remove('hidden');
+      document.getElementById('globalTimerWrap').classList.remove('hidden');
+      document.getElementById('globalTimerWrap').classList.add('flex');
+
+      document.getElementById('activeStudentLabel').textContent = appState.studentName;
+      document.getElementById('activeGroupLabel').textContent = appState.studentGroup;
+      updatePenaltyDisplay();
+
+      requestSafeFullscreen();
+      initNoiseMonitor();
+      switchSection(appState.currentSection || 1);
+      syncFirebaseStatus(isResuming ? 'reanudado' : 'en_curso');
+
+      clearInterval(globalInterval);
+      document.getElementById('globalTimerDisplay').textContent = formatMMSS(appState.remainingSeconds);
+      globalInterval = setInterval(() => {
+        if (appState.finished) return;
+        appState.remainingSeconds -= 1;
+        const disp = document.getElementById('globalTimerDisplay');
+        disp.textContent = formatMMSS(appState.remainingSeconds);
+        if (appState.remainingSeconds <= 300) {
+          disp.className = 'font-mono font-extrabold text-rose-400 animate-pulse';
+        }
+        if (appState.remainingSeconds % 10 === 0) saveProgress();
+        if (appState.remainingSeconds % 30 === 0) syncFirebaseStatus('en_curso');
+        if (appState.remainingSeconds <= 0) {
+          finalizeExamAndGeneratePDF('Tiempo límite de 45 minutos cumplido');
+        }
+      }, 1000);
+    }
+
+    function initParticlesBackground() {
+      const c = document.getElementById('particlesBg');
+      const ctx = c.getContext('2d');
+      let w = (c.width = window.innerWidth);
+      let h = (c.height = window.innerHeight);
+      window.addEventListener('resize', () => {
+        w = c.width = window.innerWidth;
+        h = c.height = window.innerHeight;
+      });
+      const pts = Array.from({ length: 38 }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: 1.2 + Math.random() * 2.2,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35
+      }));
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = 'rgba(125, 211, 252, 0.32)';
+        pts.forEach((p) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0 || p.x > w) p.vx *= -1;
+          if (p.y < 0 || p.y > h) p.vy *= -1;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    function wireDOMEvents() {
+      document.getElementById('mainBannerImg').src = generateOfficialBannerDataURL();
+
+      setInterval(() => {
+        const clk = document.getElementById('liveClockDisplay');
+        if (clk) clk.textContent = new Date().toLocaleTimeString('es-CO');
+      }, 1000);
+
+      // Validación nombre completo mínimo 2 palabras
+      const nameInput = document.getElementById('studentNameInput');
+      const startBtn = document.getElementById('startExamBtn');
+      nameInput.addEventListener('input', () => {
+        const parts = nameInput.value.trim().split(/\s+/).filter((p) => p.length >= 2);
+        startBtn.disabled = parts.length < 2;
+      });
+
+      startBtn.addEventListener('click', () => {
+        appState.studentName = nameInput.value.trim();
+        appState.studentGroup = document.getElementById('studentGroupInput').value;
+        enterExamWorkspace(false);
+      });
+
+      // Botones de navegación entre secciones
+      document.querySelectorAll('.sec-nav-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          switchSection(Number(btn.getAttribute('data-sec')));
+        });
+      });
+
+      // Controles Sección 1
+      document.getElementById('prevSimBtn').onclick = () => {
+        if (appState.currentSimIndex > 0) {
+          appState.currentSimIndex -= 1;
+          renderCurrentSimulation();
+        }
+      };
+      document.getElementById('nextSimOrSectionBtn').onclick = () => {
+        if (appState.currentSimIndex < BIOME_SIMULATIONS.length - 1) {
+          appState.currentSimIndex += 1;
+          renderCurrentSimulation();
+        } else {
+          switchSection(2);
+        }
+      };
+
+      // Controles Sección 2
+      document.getElementById('prevSaberBtn').onclick = () => {
+        if (appState.currentSaberIndex > 0) {
+          appState.currentSaberIndex -= 1;
+          renderCurrentSaberQuestion();
+        }
+      };
+      document.getElementById('nextSaberBtn').onclick = () => {
+        if (appState.currentSaberIndex < SABER_QUESTIONS.length - 1) {
+          appState.currentSaberIndex += 1;
+          renderCurrentSaberQuestion();
+        } else {
+          switchSection(3);
+        }
+      };
+
+      // Controles Sección 3
+      document.getElementById('prevRoleBtn').onclick = () => {
+        if (appState.currentRoleIndex > 0) {
+          appState.currentRoleIndex -= 1;
+          renderCurrentRoleCase();
+        }
+      };
+      document.getElementById('nextRoleBtn').onclick = () => {
+        if (appState.currentRoleIndex < ROLE_CASES.length - 1) {
+          appState.currentRoleIndex += 1;
+          renderCurrentRoleCase();
+        }
+      };
+
+      // Confirmación de cierre
+      document.getElementById('finishExamBtn').onclick = () => {
+        const pendingSaber = appState.saberAnswers.filter((x) => x === null).length;
+        const pendingRoles = appState.roleAnswers.filter((t) => countSubstantiveWords(t).total < 28).length;
+        const pendingSims = BIOME_SIMULATIONS.filter((b) => {
+          const st = appState.simData[b.id];
+          return st.changes < 3 || countSubstantiveWords(st.justification).total < 25;
+        }).length;
+
+        document.getElementById('confirmSubmitSummary').textContent =
+          'Resumen antes de cerrar: Simulaciones pendientes: ' + pendingSims +
+          ' | Preguntas Saber sin marcar: ' + pendingSaber +
+          ' | Casos de rol por completar: ' + pendingRoles +
+          '. Al confirmar se cerrará definitivamente la sesión y se descargará automáticamente tu informe en .PDF.';
+        document.getElementById('confirmSubmitModal').classList.remove('hidden');
+      };
+
+      document.getElementById('cancelSubmitBtn').onclick = () => {
+        document.getElementById('confirmSubmitModal').classList.add('hidden');
+      };
+      document.getElementById('confirmFinalSubmitBtn').onclick = () => {
+        finalizeExamAndGeneratePDF('Finalización voluntaria del estudiante');
+      };
+
+      // Restaurar pantalla completa
+      document.getElementById('restoreFullscreenBtn').onclick = () => {
+        requestSafeFullscreen();
+        document.getElementById('fullscreenModal').classList.add('hidden');
+      };
+
+      // Panel Maestro Docente
+      const teacherModal = document.getElementById('teacherModal');
+      document.getElementById('openTeacherBtn').onclick = () => {
+        document.getElementById('teacherAuthStep').classList.remove('hidden');
+        document.getElementById('teacherControlsStep').classList.add('hidden');
+        document.getElementById('teacherKeyInput').value = '';
+        document.getElementById('teacherAuthError').classList.add('hidden');
+        document.getElementById('teacherFeedbackMsg').textContent = '';
+        teacherModal.classList.remove('hidden');
+      };
+      document.getElementById('closeTeacherModalBtn').onclick = () => {
+        teacherModal.classList.add('hidden');
+      };
+
+      document.getElementById('verifyTeacherBtn').onclick = () => {
+        const val = document.getElementById('teacherKeyInput').value;
+        if (verifyTeacherCredential(val)) {
+          document.getElementById('teacherAuthStep').classList.add('hidden');
+          document.getElementById('teacherControlsStep').classList.remove('hidden');
+          document.getElementById('tEditTitle').value = EXAM_CONFIG.examTitle;
+          document.getElementById('tEditPassing').value = EXAM_CONFIG.passingGrade;
+          document.getElementById('tEditRemainingMin').value = Math.max(1, Math.ceil(appState.remainingSeconds / 60));
+          document.getElementById('tToggleNoise').checked = EXAM_CONFIG.noiseEnabled;
+        } else {
+          document.getElementById('teacherAuthError').classList.remove('hidden');
+        }
+      };
+
+      document.getElementById('tSaveModificationsBtn').onclick = () => {
+        const newTitle = document.getElementById('tEditTitle').value.trim();
+        const newPass = Number(document.getElementById('tEditPassing').value);
+        const newMin = Number(document.getElementById('tEditRemainingMin').value);
+        if (newTitle) {
+          EXAM_CONFIG.examTitle = newTitle;
+          document.getElementById('uiExamTitle').textContent = newTitle;
+        }
+        if (newPass >= 1.0 && newPass <= 5.0) {
+          EXAM_CONFIG.passingGrade = newPass;
+          document.getElementById('uiPassingScoreBadge').textContent = newPass.toFixed(2);
+        }
+        if (newMin >= 1 && newMin <= 180) {
+          appState.remainingSeconds = Math.round(newMin * 60);
+          document.getElementById('globalTimerDisplay').textContent = formatMMSS(appState.remainingSeconds);
+          document.getElementById('welcomeMinutesLabel').textContent = newMin + ' minutos';
+        }
+        EXAM_CONFIG.noiseEnabled = document.getElementById('tToggleNoise').checked;
+        document.getElementById('mainBannerImg').src = generateOfficialBannerDataURL();
+        saveProgress();
+        document.getElementById('teacherFeedbackMsg').textContent = '✓ Modificaciones aplicadas en vivo.';
+      };
+
+      document.getElementById('tUnlockTimersBtn').onclick = () => {
+        appState.saberReadUnlocked = Array(15).fill(true);
+        clearInterval(saberReadTimer);
+        if (appState.currentSection === 2) renderCurrentSaberQuestion();
+        saveProgress();
+        document.getElementById('teacherFeedbackMsg').textContent = '✓ Temporizadores de lectura desbloqueados.';
+      };
+
+      document.getElementById('tClearPenaltiesBtn').onclick = () => {
+        appState.penalties = [];
+        appState.totalPenaltyPoints = 0;
+        updatePenaltyDisplay();
+        saveProgress();
+        document.getElementById('teacherFeedbackMsg').textContent = '✓ Penalizaciones anuladas a 0.00.';
+      };
+
+      document.getElementById('tJumpSec2Btn').onclick = () => {
+        if (appState.started) switchSection(2);
+        teacherModal.classList.add('hidden');
+      };
+
+      document.getElementById('tJumpSec3Btn').onclick = () => {
+        if (appState.started) switchSection(3);
+        teacherModal.classList.add('hidden');
+      };
+
+      document.getElementById('tForceFinishBtn').onclick = () => {
+        teacherModal.classList.add('hidden');
+        if (!appState.started) {
+          appState.studentName = nameInput.value.trim() || 'Estudiante Modo Docente';
+          appState.started = true;
+        }
+        finalizeExamAndGeneratePDF('Cierre directo autorizado por Docente');
+      };
+
+      document.getElementById('tResetAttemptBtn').onclick = () => {
+        localStorage.removeItem(EXAM_CONFIG.storageKey);
+        location.reload();
+      };
+    }
+
+    // Inicialización general
+    window.addEventListener('DOMContentLoaded', () => {
+      initParticlesBackground();
+      initAntiCheatGuards();
+      wireDOMEvents();
+      checkSavedProgress();
+    });
+  </script>
+</body>
+</html>
